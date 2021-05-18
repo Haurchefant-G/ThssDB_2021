@@ -1,0 +1,11 @@
+/src/main/resources/
+/doc
+/out
+/target
+/.idea
+/*.txt
+/*.index
+/*.db
+/*.meta
+/out/production/ThssDB/idoc-gen/
+.DS_Store
