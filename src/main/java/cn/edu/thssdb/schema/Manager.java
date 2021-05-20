@@ -1,7 +1,10 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.KeyNotExistException;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
+import cn.edu.thssdb.parser.statement.*;
+import cn.edu.thssdb.parser.statement.Column;
 import cn.edu.thssdb.utils.DatabaseMetaVisitor;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -9,6 +12,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Manager {
@@ -36,7 +41,7 @@ public class Manager {
    * 创建新的数据库
    * @param name 数据库名
    */
-  private void createDatabaseIfNotExists(String name) {
+  public void createDatabaseIfNotExists(String name) {
     // TODO
     lock.writeLock().lock();
     if (databases.get(name) == null) {
@@ -51,7 +56,7 @@ public class Manager {
    * 删除数据库，若删除的是当前操作数据库,应该将当前操作数据库置为null
    * @param name
    */
-  private void deleteDatabase(String name) {
+  public void deleteDatabase(String name) {
     // TODO
     lock.writeLock().lock();
     Database database = databases.remove(name);
@@ -85,7 +90,7 @@ public class Manager {
   /**
    * 更新所有数据库元数据
    */
-  private void persistMeta(){
+  public void persistMeta(){
     try {
       FileWriter fw = new FileWriter("manager.meta");
       BufferedWriter bw = new BufferedWriter(fw);
@@ -102,7 +107,7 @@ public class Manager {
   /**
    * 从元数据恢复所有数据库（不包含数据库内数据，因为只有操作某个数据库时才会加载那个数据库的元数据）
    */
-  private void recoverMeta() {
+  public void recoverMeta() {
     lock.readLock().lock();
     File f = new File("manager.meta");
     if(!f.exists()) {
@@ -135,7 +140,71 @@ public class Manager {
     lock.readLock().unlock();
   }
 
-  private static class ManagerHolder {
+  public Database getDatabase (String databaseName) {
+    lock.readLock().lock();
+    try {
+      return databases.get(databaseName);
+    } catch (KeyNotExistException e) {
+      throw new KeyNotExistException();
+    }
+    finally {
+      lock.readLock().unlock();
+    }
+  }
+
+    public String showTables(String databaseName) {
+      // TODO:
+      Database database = getDatabase(databaseName);
+      StringJoiner sj = new StringJoiner(",");
+      try {
+        database.lock.readLock().lock();
+        for (String tableName : database.getTables().keySet()) {
+          sj.add(tableName);
+        }
+      } finally {
+        database.lock.readLock().unlock();
+      }
+      return String.format("Tables in %s: %s", database, sj.toString());
+    }
+
+    public void createTable(String tableName, List<Column> columns) {
+      // TODO:
+    }
+
+    public void createUser(String user, String password) {
+      // TODO:
+    }
+
+    public void dropUser(String username) {
+
+    }
+
+    public Object showTableMeta(String tableName) {
+      return null;
+    }
+
+    public int delete(String tableName, Where condition) {
+      return 0;
+    }
+
+  public void dropTable(String tableName) {
+  }
+
+  public Object showDatabases() {
+    return null;
+  }
+
+  public void insert(String tableName, List<String> columnNames, List<Value> values) {
+  }
+
+  public void update(String tableName, String columnName, Expression expression, Where condition) {
+  }
+
+  public Object select(List<Column> columns, List<TableQuery> tableQueries, Where condition, boolean distinct) {
+    return null;
+  }
+
+  public static class ManagerHolder {
     private static final Manager INSTANCE = new Manager();
     private ManagerHolder() {
 

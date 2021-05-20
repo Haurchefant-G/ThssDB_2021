@@ -253,4 +253,9 @@ public class Database {
   public void commitTable(String tablename) {
     tables.get(tablename).commit();
   }
+
+
+  public HashMap<String, Table> getTables() {
+    return tables;
+  }
 }
