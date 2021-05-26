@@ -1,7 +1,5 @@
 package cn.edu.thssdb.service;
 
-import cn.edu.thssdb.parser.SQLLexer;
-import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnetResp;
@@ -11,14 +9,14 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
+import cn.edu.thssdb.parser.SQLResult;
+import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.ServerSQLVisitor;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.thrift.TException;
 
 import java.util.Date;
+import java.util.List;
 
 public class IServiceHandler implements IService.Iface {
 
@@ -34,9 +32,10 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ConnectResp connect(ConnectReq req) throws TException {
-    // TODO
+    // TODO: password check?
     Status status = new Status(Global.SUCCESS_CODE);
-    ConnectResp resp = new ConnectResp(status, generateSessionId());
+    long sessionId = ThssDB.getInstance().setupSession();
+    ConnectResp resp = new ConnectResp(status, sessionId);
     return resp;
   }
 
@@ -48,15 +47,20 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-    // TODO
-    //ExecuteStatementResp resp = new ExecuteStatementResp();
-    CharStream stream = CharStreams.fromString(req.getStatement());
-    SQLLexer lexer = new SQLLexer(stream);
-    CommonTokenStream token = new CommonTokenStream(lexer);
-    SQLParser parser = new SQLParser(token);
-    //SQLParser.ParseContext c = parser.parse();
-//        ServerSql.visitParse(parser.parse());
-    return (ExecuteStatementResp) ServerSql.visitSql_stmt_list(parser.sql_stmt_list());
+    ThssDB thssDB = ThssDB.getInstance();
+    System.out.println("收到了");
+    List<SQLResult> results = thssDB.execute(req.getStatement(), req.sessionId);
+    SQLResult result = results.get(0);
+    Status status = result.isSucceed() ? new Status(Global.SUCCESS_CODE) : new Status(Global.FAILURE_CODE);
+    boolean isAbort = result.isAbort();
+    boolean hasResult = result.isHasResult();
+    String msg = result.getMsg();
+    ExecuteStatementResp resp = new ExecuteStatementResp(status, isAbort, hasResult, msg);
+    if (result.isHasResult()) {
+      resp.setColumnsList(result.getColumnList());
+      resp.setRowList(result.getRowList());
+    }
+    return resp;
   }
 
   public long generateSessionId() {

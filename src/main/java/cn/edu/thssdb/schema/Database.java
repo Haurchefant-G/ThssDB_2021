@@ -1,9 +1,11 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
+import cn.edu.thssdb.query.Where;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.TableMetaVisitor;
 import org.antlr.v4.runtime.CharStream;
@@ -14,6 +16,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Database {
@@ -257,5 +260,28 @@ public class Database {
 
   public HashMap<String, Table> getTables() {
     return tables;
+  }
+
+  Table getTable(String tableName) {
+    try {
+      lock.readLock().lock();
+      Table table = tables.get(tableName);
+      if (table == null) {
+        throw new TableNotExistException(name, tableName);
+      }
+      return table;
+    } finally {
+      lock.readLock().unlock();
+    }
+  }
+
+  public QueryResult select(List<QueryTable> queryTables, List<Column> columns, Where condition, boolean distinct) {
+    try {
+      lock.readLock().lock();
+      QueryResult queryResult = new QueryResult(queryTables, columns, condition, distinct);
+    } finally {
+      lock.readLock().unlock();
+    }
+    return null;
   }
 }

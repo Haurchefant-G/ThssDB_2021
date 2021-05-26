@@ -11,16 +11,17 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntBiFunction;
 
 public class QueryTable implements Iterator<Row> {
 
-  private ArrayList<Column> columns;
+  private List<Column> columns;
   private BPlusTreeIterator<Entry, Row> iterator;
   private String tableName;
-  private QueryTable() {
+  public QueryTable() {
     // 得传一张表才能构造 设为private 不让人调用
   }
 

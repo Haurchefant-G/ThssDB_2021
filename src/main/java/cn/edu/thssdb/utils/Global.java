@@ -23,4 +23,6 @@ public class Global {
   public static final String ADMIN_PASSWORD = "admin";
 
   public static final String S_URL_INTERNAL = "jdbc:default:connection";
+
+  public static final String STAR = "*";
 }

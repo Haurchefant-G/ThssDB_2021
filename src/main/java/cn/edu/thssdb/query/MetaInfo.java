@@ -43,4 +43,11 @@ public class MetaInfo {
     }
   }
 
+  public String getTableName() {
+    return tableName;
+  }
+
+  public List<Column> getColumns() {
+    return columns;
+  }
 }

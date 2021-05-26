@@ -20,6 +20,10 @@ public class Row implements Serializable {
     this.entries = new ArrayList<>(Arrays.asList(entries));
   }
 
+  public Row(ArrayList<Entry> entries) {
+    this.entries = entries;
+  }
+
   public ArrayList<Entry> getEntries() {
     return entries;
   }
@@ -51,5 +55,10 @@ public class Row implements Serializable {
     }
     newentries[index] = valueEntry;
     return new Row(newentries);
+  }
+
+  public Comparable valueOf(int index) {
+    Entry entry = entries.get(index);
+    return entry != null ? entry.value : null;
   }
 }

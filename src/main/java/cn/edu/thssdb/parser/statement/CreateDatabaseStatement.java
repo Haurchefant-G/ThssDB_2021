@@ -1,7 +1,7 @@
 package cn.edu.thssdb.parser.statement;
 
-public class CreateDatabaseStatement {
-    private String databaseName;
+public class CreateDatabaseStatement extends Statement {
+    String databaseName;
 
     public CreateDatabaseStatement(String databaseName) {
         this.databaseName = databaseName;
@@ -14,4 +14,6 @@ public class CreateDatabaseStatement {
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
+
+    public StatementType getType() { return StatementType.CREATE_DATABASE; }
 }

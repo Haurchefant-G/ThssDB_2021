@@ -1,21 +1,17 @@
 package cn.edu.thssdb.parser;
 
-import cn.edu.thssdb.parser.operation.*;
 import cn.edu.thssdb.parser.statement.*;
-import cn.edu.thssdb.query.QueryTable;
-import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.query.*;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.type.*;
+import cn.edu.thssdb.utils.Global;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MySQLVisitor extends SQLBaseVisitor<Object> {
-
-    private Manager manager;
-
-    public MySQLVisitor(Manager manager) {
+    public MySQLVisitor() {
         super();
-        this.manager = manager;
     }
 
     @Override
@@ -28,11 +24,12 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         ';'* sql_stmt ( ';'+ sql_stmt )* ';'* ;
     */
     @Override
-    public Object visitSql_stmt_list(SQLParser.Sql_stmt_listContext ctx) {
+    public List<Statement> visitSql_stmt_list(SQLParser.Sql_stmt_listContext ctx) {
+        List<Statement> statements = new ArrayList<>();
         for (SQLParser.Sql_stmtContext sql_stmtContext : ctx.sql_stmt()) {
-            visitSql_stmt(sql_stmtContext);
+            statements.add(visitSql_stmt(sql_stmtContext));
         }
-        return super.visitSql_stmt_list(ctx);
+        return statements;
     }
 
     /*
@@ -58,8 +55,8 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         | update_stmt ;
      */
     @Override
-    public Object visitSql_stmt(SQLParser.Sql_stmtContext ctx) {
-        return visit(ctx.getChild(0));
+    public Statement visitSql_stmt(SQLParser.Sql_stmtContext ctx) {
+        return (Statement) visit(ctx.getChild(0));
     }
 
     /*
@@ -67,10 +64,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_CREATE K_DATABASE database_name ;
      */
     @Override
-    public Object visitCreate_db_stmt(SQLParser.Create_db_stmtContext ctx) {
+    public CreateDatabaseStatement visitCreate_db_stmt(SQLParser.Create_db_stmtContext ctx) {
         String databaseName = visitDatabase_name(ctx.database_name());
-        manager.createDatabaseIfNotExists(databaseName);
-        return super.visitCreate_db_stmt(ctx);
+        return new CreateDatabaseStatement(databaseName);
     }
 
     /*
@@ -78,10 +74,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_DROP K_DATABASE ( K_IF K_EXISTS )? database_name ;
      */
     @Override
-    public Object visitDrop_db_stmt(SQLParser.Drop_db_stmtContext ctx) {
-        String databaseName = (String) visit(ctx.database_name());
-        manager.deleteDatabase(databaseName);
-        return super.visitDrop_db_stmt(ctx);
+    public DropDatabaseStatement visitDrop_db_stmt(SQLParser.Drop_db_stmtContext ctx) {
+        String databaseName = visitDatabase_name(ctx.database_name());
+        return new DropDatabaseStatement(databaseName);
     }
 
     /*
@@ -89,11 +84,10 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_CREATE K_USER user_name K_IDENTIFIED K_BY password ;
      */
     @Override
-    public Object visitCreate_user_stmt(SQLParser.Create_user_stmtContext ctx) {
+    public CreateUserStatement visitCreate_user_stmt(SQLParser.Create_user_stmtContext ctx) {
         String username = visitUser_name(ctx.user_name());
         String password = visitPassword(ctx.password());
-        manager.createUser(username, password);
-        return super.visitCreate_user_stmt(ctx);
+        return new CreateUserStatement(username, password);
     }
 
     /*
@@ -101,12 +95,10 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_DROP K_USER ( K_IF K_EXISTS )? user_name ;
      */
     @Override
-    public Object visitDrop_user_stmt(SQLParser.Drop_user_stmtContext ctx) {
+    public DropUserStatement visitDrop_user_stmt(SQLParser.Drop_user_stmtContext ctx) {
         String username = visitUser_name(ctx.user_name());
-        manager.dropUser(username);
-        return super.visitDrop_user_stmt(ctx);
+        return new DropUserStatement(username);
     }
-
 
     /*
     create_table_stmt :
@@ -114,9 +106,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         '(' column_def ( ',' column_def )* ( ',' table_constraint )? ')' ;
      */
     @Override
-    public Object visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx) {
+    public CreateTableStatement visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx) {
         String tableName = (String) visit(ctx.table_name());
-        List<Column> columns = new ArrayList<>();
+        ArrayList<Column> columns = new ArrayList<>();
         for (SQLParser.Column_defContext def : ctx.column_def()) {
             columns.add(visitColumn_def(def));
         }
@@ -126,8 +118,8 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             primaryKeys = visitTable_constraint(ctx.table_constraint());
             for (String primaryKey : primaryKeys) {
                 for (Column column : columns) {
-                    if (column.getColumnName().equals(primaryKey)) {
-                        column.setPrimary(true);
+                    if (column.getName().equals(primaryKey)) {
+                        column.setPrimary(1);
                         column.setNotNull(true);
                         break;
                     }
@@ -135,8 +127,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             }
         }
 
-        manager.createTable(tableName, columns);
-        return super.visitCreate_table_stmt(ctx);
+        return new CreateTableStatement(tableName, columns);
     }
 
 
@@ -145,10 +136,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_SHOW K_TABLE table_name ;
      */
     @Override
-    public Object visitShow_meta_stmt(SQLParser.Show_meta_stmtContext ctx) {
+    public ShowTableMetaStatement visitShow_meta_stmt(SQLParser.Show_meta_stmtContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
-        manager.showTableMeta(tableName);
-        return super.visitShow_meta_stmt(ctx);
+        return new ShowTableMetaStatement(tableName);
     }
 
     @Override
@@ -168,8 +158,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     @Override
     public Object visitUse_db_stmt(SQLParser.Use_db_stmtContext ctx) {
         String databaseName = visitDatabase_name(ctx.database_name());
-        manager.switchDatabase(databaseName);
-        return super.visitUse_db_stmt(ctx);
+        return new UseDatabaseStatement(databaseName);
     }
 
     /*
@@ -177,14 +166,13 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_DELETE K_FROM table_name ( K_WHERE multiple_condition )? ;
      */
     @Override
-    public DeleteOperation visitDelete_stmt(SQLParser.Delete_stmtContext ctx) {
+    public DeleteStatement visitDelete_stmt(SQLParser.Delete_stmtContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
         Where condition = null;
         if (ctx.multiple_condition() != null) {
             condition = visitMultiple_condition(ctx.multiple_condition());
         }
-        manager.delete(tableName, condition);
-        return new DeleteOperation(tableName, condition);
+        return new DeleteStatement(tableName, condition);
     }
 
     /*
@@ -192,10 +180,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_DROP K_TABLE ( K_IF K_EXISTS )? table_name ;
      */
     @Override
-    public Object visitDrop_table_stmt(SQLParser.Drop_table_stmtContext ctx) {
+    public DropTableStatement visitDrop_table_stmt(SQLParser.Drop_table_stmtContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
-        manager.dropTable(tableName);
-        return super.visitDrop_table_stmt(ctx);
+        return new DropTableStatement(tableName);
     }
 
     /*
@@ -203,8 +190,8 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_SHOW K_DATABASES;
      */
     @Override
-    public Object visitShow_db_stmt(SQLParser.Show_db_stmtContext ctx) {
-        return manager.showDatabases();
+    public ShowDatabasesStatement visitShow_db_stmt(SQLParser.Show_db_stmtContext ctx) {
+        return new ShowDatabasesStatement();
     }
 
     @Override
@@ -217,9 +204,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         K_SHOW K_DATABASE database_name;
      */
     @Override
-    public Object visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) {
+    public ShowTablesStatement visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) {
         String databaseName = visitDatabase_name(ctx.database_name());
-        return manager.showTables(databaseName);
+        return new ShowTablesStatement(databaseName);
     }
 
     /*
@@ -228,7 +215,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             K_VALUES value_entry ( ',' value_entry )* ;
      */
     @Override
-    public Object visitInsert_stmt(SQLParser.Insert_stmtContext ctx) {
+    public InsertStatement visitInsert_stmt(SQLParser.Insert_stmtContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
 
         List<String> columnNames = new ArrayList<>();
@@ -238,12 +225,13 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             }
         }
 
+        List<List<Value>> valueList = new ArrayList<>();
         for (SQLParser.Value_entryContext valueEntryContext : ctx.value_entry()) {
             List<Value> values = visitValue_entry(valueEntryContext);
-            manager.insert(tableName, columnNames, values);
+            valueList.add(values);
         }
 
-        return super.visitInsert_stmt(ctx);
+        return new InsertStatement(tableName, columnNames, valueList);
     }
 
     /*
@@ -265,7 +253,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             K_FROM table_query ( ',' table_query )* ( K_WHERE multiple_condition )? ;
      */
     @Override
-    public Object visitSelect_stmt(SQLParser.Select_stmtContext ctx) {
+    public SelectStatement visitSelect_stmt(SQLParser.Select_stmtContext ctx) {
         boolean distinct = ctx.K_DISTINCT() != null;
         List<Column> columns = new ArrayList<>();
         for (SQLParser.Result_columnContext resultColumnContext : ctx.result_column()) {
@@ -279,7 +267,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         if (ctx.multiple_condition() != null) {
             condition = visitMultiple_condition(ctx.multiple_condition());
         }
-        return manager.select(columns, tableQueries, condition, distinct);
+        return new SelectStatement(columns, tableQueries, condition, distinct);
     }
 
     @Override
@@ -306,8 +294,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         if (ctx.multiple_condition() != null) {
             condition = visitMultiple_condition(ctx.multiple_condition());
         }
-        manager.update(tableName, columnName, expression, condition);
-        return super.visitUpdate_stmt(ctx);
+        return new UpdateStatement(tableName, columnName, expression, condition);
     }
 
     /*
@@ -486,9 +473,9 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     @Override
     public Column visitResult_column(SQLParser.Result_columnContext ctx) {
         if (ctx.getChild(0).getText().equals("*")) {
-            return new Column(null, "*");
+            return new Column(Global.STAR, null);
         } else if (ctx.getChildCount() > 1) {
-            return new Column(visitTable_name(ctx.table_name()), "*");
+            return new Column(Global.STAR, visitTable_name(ctx.table_name()));
         } else {
             return visitColumn_full_name(ctx.column_full_name());
         }
@@ -545,7 +532,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     public Column visitColumn_full_name(SQLParser.Column_full_nameContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
         String columnName = visitColumn_name(ctx.column_name());
-        return new Column(tableName, columnName);
+        return new Column(columnName, tableName);
     }
 
     /*

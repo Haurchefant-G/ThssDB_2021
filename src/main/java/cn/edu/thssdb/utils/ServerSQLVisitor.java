@@ -10,6 +10,7 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Row;
+import cn.edu.thssdb.server.Session;
 import cn.edu.thssdb.type.ColumnType;
 
 import com.googlecode.aviator.AviatorEvaluator;
@@ -30,8 +31,8 @@ public class ServerSQLVisitor extends SQLBaseVisitor<Object> {
 
     }
 
-    public ServerSQLVisitor(String Dbname) {
-        manager.switchDatabase(Dbname);
+    public ServerSQLVisitor(String Dbname, Session session) {
+        manager.switchDatabase(Dbname, session);
     }
 
     @Override

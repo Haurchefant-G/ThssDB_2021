@@ -1,17 +1,24 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Row;
 import cn.edu.thssdb.utils.Cell;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class QueryResult {
 
-  private List<MetaInfo> metaInfoInfos;
+  private List<MetaInfo> metaInfos;
   private List<Integer> index;
   private List<Cell> attrs;
+  private Predicate<Row> predicate;
+
+  public List<Column> columns;
+
+  boolean distinct;
 
   public QueryResult(QueryTable[] queryTables) {
     // TODO
@@ -19,8 +26,12 @@ public class QueryResult {
     this.attrs = new ArrayList<>();
   }
 
-  public static Row combineRow(LinkedList<Row> rows) {
-    // TODO
+    public QueryResult(List<QueryTable> queryTables, List<Column> columns, Where condition, boolean distinct) {
+      this.distinct = distinct;
+      this.columns = columns;
+    }
+
+    public static Row combineRow(LinkedList<Row> rows) {
     ArrayList<Entry> entries = new ArrayList<>();
     for(Row row: rows) {
       entries.addAll(row.getEntries());

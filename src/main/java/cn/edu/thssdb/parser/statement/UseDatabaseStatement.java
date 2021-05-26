@@ -1,9 +1,9 @@
 package cn.edu.thssdb.parser.statement;
 
-public class DropDatabaseStatement {
-    private String databaseName;
+public class UseDatabaseStatement extends Statement {
+    String databaseName;
 
-    public DropDatabaseStatement(String databaseName) {
+    public UseDatabaseStatement(String databaseName) {
         this.databaseName = databaseName;
     }
 
@@ -14,4 +14,6 @@ public class DropDatabaseStatement {
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
+
+    public StatementType getType() { return StatementType.USE_DATABASE; }
 }

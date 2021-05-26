@@ -2,6 +2,7 @@ package cn.edu.thssdb.server;
 
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.parser.SQLResult;
 import cn.edu.thssdb.service.IServiceHandler;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.server.TServer;
@@ -10,6 +11,8 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ThssDB {
 
@@ -21,6 +24,8 @@ public class ThssDB {
   private static TServer server;
 
   private static Manager manager;
+
+  private static long sessionNumber = 0;
 
   public static ThssDB getInstance() {
     return ThssDBHolder.INSTANCE;
@@ -40,6 +45,16 @@ public class ThssDB {
     server.start();
   }
 
+  public long setupSession() {
+    long sessionId = sessionNumber++;
+    manager.addSession(sessionId);
+    return sessionId;
+  }
+
+  public void deleteSession(long sessionNumber) {
+    manager.deleteSession(sessionNumber);
+  }
+
   private void start() {
     handler = new IServiceHandler();
     processor = new IService.Processor(handler);
@@ -56,6 +71,10 @@ public class ThssDB {
     } catch (TTransportException e) {
       logger.error(e.getMessage());
     }
+  }
+
+  public List<SQLResult> execute(String sql, long sessionId) {
+    return manager.execute(sql, sessionId);
   }
 
   private static class ThssDBHolder {

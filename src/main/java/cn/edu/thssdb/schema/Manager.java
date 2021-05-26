@@ -1,24 +1,29 @@
 package cn.edu.thssdb.schema;
 
-import cn.edu.thssdb.exception.KeyNotExistException;
+import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
-import cn.edu.thssdb.parser.statement.*;
-import cn.edu.thssdb.parser.statement.Column;
+import cn.edu.thssdb.parser.SQLProcessor;
+import cn.edu.thssdb.parser.SQLResult;
+import cn.edu.thssdb.parser.statement.Statement;
+import cn.edu.thssdb.query.*;
+import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.DatabaseMetaVisitor;
+import cn.edu.thssdb.server.Session;
+import javafx.scene.control.Tab;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class Manager {
-  private HashMap<String, Database> databases;
-  private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  private final HashMap<String, Database> databases;
+  private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  private final SQLProcessor sqlProcessor = new SQLProcessor(this);
 
   public static Database selectDatabase;
 
@@ -26,15 +31,53 @@ public class Manager {
     return Manager.ManagerHolder.INSTANCE;
   }
 
+  private static ArrayList<Session> sessionList;
+
+
   public Manager() {
     // TODO
     databases = new HashMap<>();
     selectDatabase = null;
 
+    sessionList = new ArrayList<Session>();
     recoverMeta();
     createDatabaseIfNotExists("Default");
-    switchDatabase("Default");
+  }
 
+  public void addSession(long sessionId) {
+    sessionList.add(new Session(sessionId));
+  }
+
+  public void deleteSession(long sessionId) {
+    for (Session session: sessionList) {
+      if (session.getSessionId() == sessionId) {
+        session.getLock().writeLock().unlock();
+        session.getLock().readLock().unlock();
+        sessionList.remove(session);
+        break;
+      }
+    }
+  }
+
+  private Session getSession(long sessionId) {
+    for (Session session: sessionList) {
+      if (session.getSessionId() == sessionId) {
+        return session;
+      }
+    }
+    return null;
+  }
+
+  public List<SQLResult> execute(String sql, long sessionId) {
+    Session session = getSession(sessionId);
+    if (session == null) {
+        return Collections.singletonList(new SQLResult("Invalid session Id.", false));
+    }
+    List<Statement> statementList = sqlProcessor.parseSQL(sql);
+    if (statementList == null || statementList.size() == 0) {
+      return Collections.singletonList(new SQLResult("No sql command is parsed.", false));
+    }
+    return sqlProcessor.executeSQL(statementList, session);
   }
 
   /**
@@ -42,49 +85,66 @@ public class Manager {
    * @param name 数据库名
    */
   public void createDatabaseIfNotExists(String name) {
-    // TODO
-    lock.writeLock().lock();
-    if (databases.get(name) == null) {
-      Database database = new Database(name);
-      databases.put(name, database);
+    try {
+      lock.writeLock().lock();
+      if (databases.get(name) == null) {
+        Database database = new Database(name);
+        databases.put(name, database);
+      }
+      persistMeta();
+    } finally {
+      lock.writeLock().unlock();
     }
-    persistMeta();
-    lock.writeLock().unlock();
   }
 
   /**
    * 删除数据库，若删除的是当前操作数据库,应该将当前操作数据库置为null
    * @param name
    */
-  public void deleteDatabase(String name) {
-    // TODO
-    lock.writeLock().lock();
-    Database database = databases.remove(name);
-    if (database == selectDatabase) {
-      selectDatabase = null;
+  public void deleteDatabase(String name, Session session) {
+    try {
+      lock.writeLock().lock();
+      Database databaseToDelete = databases.get(name);
+      if (databaseToDelete == null) {
+        throw new DatabaseNotExistException(name);
+      }
+
+      for (Session session1 : sessionList) {
+        if (session1 != session && name.equals(session1.getDatabase().getName())) {
+          throw new DatabaseBeingUsedException(name);
+        }
+      }
+
+      if (name.equals(session.getDatabase().getName())) {
+        session.setDatabase(null);
+      }
+
+      databases.remove(name);
+      persistMeta();
+    } finally {
+      lock.writeLock().unlock();
     }
-    database.clear();
-    database = null;
-    persistMeta();
-    lock.writeLock().lock();
   }
 
   /**
    * 切换当前操作的数据库，恢复其元数据，并关闭之前的数据库，持久化关闭的数据库的元数据
    * @param name 数据库名
    */
-  public void switchDatabase(String name) {
-    // TODO
-    lock.writeLock().lock();
-    Database newSelect = databases.getOrDefault(name, selectDatabase);
-    if (newSelect != selectDatabase) {
-      if (selectDatabase != null) {
-        selectDatabase.quit();
-      }
-      selectDatabase = newSelect;
-      selectDatabase.start();
+  public void switchDatabase(String name, Session session) {
+    if (name.equals(session.getDatabase().getName())) {
+      return;
     }
-    lock.writeLock().unlock();
+
+    try {
+      session.getWriteLock().lock();
+      Database newSelect = databases.get(name);
+      if (newSelect == null) {
+        throw new DatabaseNotExistException(name);
+      }
+      session.setDatabase(newSelect);
+    } finally {
+      session.getWriteLock().unlock();
+    }
   }
 
   /**
@@ -136,13 +196,14 @@ public class Manager {
       e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
+    } finally {
+      lock.readLock().unlock();
     }
-    lock.readLock().unlock();
   }
 
   public Database getDatabase (String databaseName) {
-    lock.readLock().lock();
     try {
+      lock.readLock().lock();
       return databases.get(databaseName);
     } catch (KeyNotExistException e) {
       throw new KeyNotExistException();
@@ -152,56 +213,94 @@ public class Manager {
     }
   }
 
-    public String showTables(String databaseName) {
-      // TODO:
-      Database database = getDatabase(databaseName);
-      StringJoiner sj = new StringJoiner(",");
-      try {
-        database.lock.readLock().lock();
-        for (String tableName : database.getTables().keySet()) {
-          sj.add(tableName);
-        }
-      } finally {
-        database.lock.readLock().unlock();
-      }
-      return String.format("Tables in %s: %s", database, sj.toString());
-    }
+  public SQLResult getTableMeta(String tableName, Session session) {
+    Database database = session.getDatabase();
+    try {
+      database.lock.readLock().lock();
+      Table table = database.getTable(tableName);
 
-    public void createTable(String tableName, List<Column> columns) {
-      // TODO:
+      List<String> heads = Arrays.asList("Field", "Data Type", "Not Null", "Primary Key");
+
+      List<List<String>> tableMeta = new ArrayList<>();
+      for (Column column : table.columns) {
+        tableMeta.add(column.getMetaList());
+      }
+      return new SQLResult("Show Table " + tableName + " Meta", heads, tableMeta, true);
+    } finally {
+      database.lock.readLock().unlock();
+    }
+  }
+
+    public void createTable(String tableName, ArrayList<Column> columns, Session session) {
+      Database database = session.getDatabase();
+      try {
+        database.lock.writeLock().lock();
+        Table table = database.getTable(tableName);
+        if (table != null) {
+          throw new TableExistException(tableName);
+        }
+        database.create(tableName, columns);
+      } finally {
+        database.lock.writeLock().unlock();
+      }
     }
 
     public void createUser(String user, String password) {
-      // TODO:
     }
 
     public void dropUser(String username) {
 
     }
 
-    public Object showTableMeta(String tableName) {
-      return null;
-    }
-
-    public int delete(String tableName, Where condition) {
-      return 0;
-    }
-
-  public void dropTable(String tableName) {
+  public void dropTable(String tableName, Session session) {
+    Database database = session.getDatabase();
+    database.drop(tableName);
   }
 
-  public Object showDatabases() {
+  public QueryTable getQueryTable(TableQuery tableQuery, Session session) {
+    Database database = session.getDatabase();
+    try {
+      database.lock.readLock().lock();
+      if (tableQuery.getTableRight() == null) {
+        return new SingleTable(database.getTable(tableQuery.getTableLeft()));
+      } else {
+        Where condition = tableQuery.getWhere();
+        List<Table> tables = new ArrayList<Table>() {{
+          add(database.getTable(tableQuery.getTableLeft()));
+          add(database.getTable(tableQuery.getTableRight()));
+        }};
+        return new JointTable(tables, condition);
+      }
+    } finally {
+      database.lock.readLock().unlock();
+    }
+  }
+
+  public void insert(String tableName, List<String> columnNames, List<List<Value>> values, Session session) throws IOException {
+    Database database = session.getDatabase();
+    Table table = database.getTable(tableName);
+    table.insert(columnNames, values);
+  }
+
+  public SQLResult select(List<Column> columns, List<TableQuery> tableQueries, Where condition, boolean distinct, Session session) {
+    // TODO: support multiple join
+    Database database = session.getDatabase();
+    List<QueryTable> queryTables = tableQueries.stream().map(tableQuery -> getQueryTable(tableQuery, session)).collect(Collectors.toList());
+    QueryResult queryResult = database.select(queryTables, columns, condition, distinct);
+
     return null;
   }
 
-  public void insert(String tableName, List<String> columnNames, List<Value> values) {
+  public int delete(String tableName, Where condition, Session session) {
+    Database database = session.getDatabase();
+    Table table = database.getTable(tableName);
+    return table.delete(condition);
   }
 
-  public void update(String tableName, String columnName, Expression expression, Where condition) {
-  }
-
-  public Object select(List<Column> columns, List<TableQuery> tableQueries, Where condition, boolean distinct) {
-    return null;
+  public int update(String tableName, String columnName, Expression expression, Where condition, Session session) {
+    Database database = session.getDatabase();
+    Table table = database.getTable(tableName);
+    return table.update(columnName, expression, condition);
   }
 
   public static class ManagerHolder {

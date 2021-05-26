@@ -1,5 +1,8 @@
-package cn.edu.thssdb.parser.statement;
+package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.StringLengthTooLongException;
+import cn.edu.thssdb.schema.Column;
+import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.type.ValueType;
 
 public class Value {
@@ -26,6 +29,26 @@ public class Value {
     public Value(Column column) {
         this.column = column;
         this.type = ValueType.COLUMN;
+    }
+
+    public static Comparable adaptToColumnType(Comparable value, Column column) {
+        switch (column.getType()) {
+            case INT:
+                return ((Number) value).intValue();
+            case LONG:
+                return ((Number) value).longValue();
+            case FLOAT:
+                return ((Number) value).floatValue();
+            case DOUBLE:
+                return ((Number) value).doubleValue();
+            case STRING:
+                if (((String) value).length() > column.getMaxLength()) {
+                    throw new StringLengthTooLongException(((String) value).length(), column.getMaxLength());
+                }
+                return (String) value;
+            default:
+                return value;
+        }
     }
 
     public ValueType getType() {

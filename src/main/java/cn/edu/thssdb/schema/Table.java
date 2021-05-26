@@ -1,16 +1,26 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.index.BPlusTreeIterator;
+import cn.edu.thssdb.query.Expression;
+import cn.edu.thssdb.query.MetaInfo;
+import cn.edu.thssdb.query.Value;
+import cn.edu.thssdb.query.Where;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.FileStorage;
+import cn.edu.thssdb.utils.Page;
 import cn.edu.thssdb.utils.Pair;
+import sun.jvm.hotspot.ui.action.MemoryAction;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Table implements Iterable<Row> {
   ReentrantReadWriteLock lock;
@@ -20,6 +30,110 @@ public class Table implements Iterable<Row> {
   public BPlusTree<Entry, Row> index;
   private int primaryIndex;
   private FileStorage fileStorage;
+
+  public void insert(List<String> columnNames, List<List<Value>> values) throws IOException {
+    try {
+      lock.writeLock().lock();
+      int colNum = columnNames.size();
+      // TODO: all filled check
+      boolean insertAll = (colNum == 0);
+
+      for (List<Value> colValues : values) {
+        if (insertAll && columns.size() != colValues.size()) {
+          throw new InsertColumnSizeNotMatchException(columns.size(), colValues.size());
+        } else if (colNum != colValues.size()) {
+          throw new InsertColumnSizeNotMatchException(colNum, colValues.size());
+        }
+
+        ArrayList<Entry> entryList = new ArrayList<>();
+
+        for(int i = 0; i < columns.size(); i++) {
+          Column tableColumn = columns.get(i);
+          boolean filled = false;
+          if (insertAll) {
+            Value value = colValues.get(i);
+            if (!ColumnType.columnValueTypeCheck(tableColumn.getType(), value.getType())) {
+              throw new TypeConflictException(tableColumn.getName(), tableColumn.getType(), value.getValue());
+            }
+            entryList.add(new Entry(value.getValue()));
+            continue;
+          }
+
+          for (int j = 0; j < colNum; j++) {
+            if (columnNames.get(j).equals(tableColumn.getName())) {
+              Value value = colValues.get(j);
+              if (!ColumnType.columnValueTypeCheck(tableColumn.getType(), value.getType())) {
+                throw new TypeConflictException(tableColumn.getName(), tableColumn.getType(), value.getValue());
+              }
+              entryList.add(new Entry(value.getValue()));
+              filled = true;
+              break;
+            }
+          }
+
+          if (!filled) {
+            if (tableColumn.isNotNull()) {
+              throw new NotNullException(tableColumn.getName());
+            } else {
+              entryList.add(new Entry(null));
+            }
+          }
+        }
+        Row row = new Row(entryList);
+        insert(row);
+      }
+    } finally {
+      lock.writeLock().unlock();
+    }
+  }
+
+  public int update(String columnName, Expression expression, Where condition) {
+    try {
+      lock.writeLock().lock();
+      Column column = null;
+      int colIdx;
+      for (colIdx = 0; colIdx < columns.size(); colIdx++) {
+        if (columnName.equals(columns.get(colIdx).getName())) {
+          column = columns.get(colIdx);
+          break;
+        }
+      }
+      if (column == null) {
+        throw new ColumnNotExistException(columnName);
+      }
+
+      List<MetaInfo> metaInfos = new ArrayList<MetaInfo>() {{
+        add(getMetaInfo());
+      }};
+      Predicate<Row> predicate = null;
+      if (condition != null) {
+        predicate = condition.parse(metaInfos);
+      }
+      Function<Row, Comparable> func = expression.parse(metaInfos);
+      int updateNum = 0;
+      for (Row row : this) {
+        if (predicate == null || predicate.test(row)) {
+          updateNum++;
+          Comparable value = func.apply(row);
+          value = Value.adaptToColumnType(value, column);
+          Entry newEntry = new Entry(value);
+          Entry oldEntry = row.getEntry(primaryIndex);
+          row.entries.set(colIdx, newEntry);
+          if (column.isPrimary()) {
+            index.remove(oldEntry);
+            if (index.contains(newEntry)) {
+              index.update(newEntry, row);
+            } else {
+              index.put(newEntry, row);
+            }
+          }
+        }
+      }
+      return updateNum;
+    } finally {
+      lock.writeLock().unlock();
+    }
+  }
 
   /**
    * 读取index文件恢复BPlusTree的函数接口
@@ -172,6 +286,10 @@ public class Table implements Iterable<Row> {
     f.delete();
   }
 
+  private MetaInfo getMetaInfo() {
+    return new MetaInfo(tableName, columns);
+  }
+
   /**
    * 关闭表，维护存储文件和index文件
    */
@@ -234,6 +352,15 @@ public class Table implements Iterable<Row> {
     indexOutput.close();
   }
 
+  boolean hasKey(Entry key) {
+    try {
+      lock.readLock().lock();
+      return index.contains(key);
+    } finally {
+      lock.readLock().unlock();
+    }
+  }
+
   /**
    * 插入新一行
    * @param row
@@ -241,6 +368,10 @@ public class Table implements Iterable<Row> {
    */
   public void insert(Row row) throws IOException {
     // TODO
+    Entry primary = row.getEntries().get(primaryIndex);
+    if (hasKey(primary)) {
+      throw new DuplicateKeyException();
+    }
     fileStorage.insertToPage(row);
     index.put(row.getEntry(primaryIndex), row);
   }
@@ -254,6 +385,29 @@ public class Table implements Iterable<Row> {
     // TODO
     fileStorage.deleteFromPage(row.page, row.offset);
     index.remove(row.getEntry(primaryIndex));
+  }
+
+  public int delete(Where condition) {
+    Predicate<Row> predicate = null;
+    if (condition != null) {
+      predicate = condition.parse(new ArrayList<MetaInfo>() {{
+        add(getMetaInfo());
+      }});
+    }
+    try {
+      lock.writeLock().lock();
+      int num = 0;
+      for (Row row : this) {
+        if (predicate == null || predicate.test(row)) {
+          Entry key = row.getEntry(primaryIndex);
+          index.remove(key);
+          num++;
+        }
+      }
+      return num;
+    } finally {
+      lock.writeLock().unlock();
+    }
   }
 
 //  public void deleteAll() {
