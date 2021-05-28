@@ -8,7 +8,6 @@ import cn.edu.thssdb.type.ValueType;
 public class Value {
     private ValueType type;
     private Comparable value;
-    private Column column;
 
     public Value(String value, ValueType valueType) {
         this.type = valueType;
@@ -19,16 +18,14 @@ public class Value {
                 break;
             case INT:
                 this.value = Integer.parseInt(value);
+                break;
             case DOUBLE:
                 this.value = Double.parseDouble(value);
+                break;
             case NULL:
                 this.value = null;
+                break;
         }
-    }
-
-    public Value(Column column) {
-        this.column = column;
-        this.type = ValueType.COLUMN;
     }
 
     public static Comparable adaptToColumnType(Comparable value, Column column) {

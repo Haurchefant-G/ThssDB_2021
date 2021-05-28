@@ -8,15 +8,20 @@ import cn.edu.thssdb.utils.Global;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MySQLVisitor extends SQLBaseVisitor<Object> {
     public MySQLVisitor() {
         super();
     }
 
+    /*
+    parse :
+        sql_stmt_list ;
+     */
     @Override
-    public Object visitParse(SQLParser.ParseContext ctx) {
-        return super.visitParse(ctx);
+    public List<Statement> visitParse(SQLParser.ParseContext ctx) {
+        return visitSql_stmt_list(ctx.sql_stmt_list());
     }
 
     /*
@@ -113,9 +118,8 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
             columns.add(visitColumn_def(def));
         }
 
-        List<String> primaryKeys = null;
         if (ctx.table_constraint() != null) {
-            primaryKeys = visitTable_constraint(ctx.table_constraint());
+            List<String> primaryKeys = visitTable_constraint(ctx.table_constraint());
             for (String primaryKey : primaryKeys) {
                 for (Column column : columns) {
                     if (column.getName().equals(primaryKey)) {
@@ -132,11 +136,20 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
 
 
     /*
-    show_meta_stmt :
+    show_tables_stmt :
+        K_SHOW K_TABLES;
+     */
+    @Override
+    public Object visitShow_tables_stmt(SQLParser.Show_tables_stmtContext ctx) {
+        return new ShowTablesStatement();
+    }
+
+    /*
+    show_table_stmt :
         K_SHOW K_TABLE table_name ;
      */
     @Override
-    public ShowTableMetaStatement visitShow_meta_stmt(SQLParser.Show_meta_stmtContext ctx) {
+    public ShowTableMetaStatement visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) {
         String tableName = visitTable_name(ctx.table_name());
         return new ShowTableMetaStatement(tableName);
     }
@@ -200,16 +213,6 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     }
 
     /*
-    show_table_stmt :
-        K_SHOW K_DATABASE database_name;
-     */
-    @Override
-    public ShowTablesStatement visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) {
-        String databaseName = visitDatabase_name(ctx.database_name());
-        return new ShowTablesStatement(databaseName);
-    }
-
-    /*
     insert_stmt :
         K_INSERT K_INTO table_name ( '(' column_name ( ',' column_name )* ')' )?
             K_VALUES value_entry ( ',' value_entry )* ;
@@ -255,19 +258,25 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     @Override
     public SelectStatement visitSelect_stmt(SQLParser.Select_stmtContext ctx) {
         boolean distinct = ctx.K_DISTINCT() != null;
-        List<Column> columns = new ArrayList<>();
+        List<String> columns = new ArrayList<>();
         for (SQLParser.Result_columnContext resultColumnContext : ctx.result_column()) {
-            columns.add(visitResult_column(resultColumnContext));
+//            columns.add(visitResult_column(resultColumnContext));
+            String columnName = resultColumnContext.getText().toLowerCase();
+            if (columnName.equals("*")) {
+                columns = null;
+                break;
+            }
+            columns.add(columnName);
         }
         List<TableQuery> tableQueries = new ArrayList<>();
         for (SQLParser.Table_queryContext tableQueryContext : ctx.table_query()) {
             tableQueries.add(this.visitTable_query(tableQueryContext));
         }
-        Where condition = null;
+        Where where = null;
         if (ctx.multiple_condition() != null) {
-            condition = visitMultiple_condition(ctx.multiple_condition());
+            where = visitMultiple_condition(ctx.multiple_condition());
         }
-        return new SelectStatement(columns, tableQueries, condition, distinct);
+        return new SelectStatement(columns, tableQueries, where, distinct);
     }
 
     @Override
@@ -392,7 +401,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     @Override
     public Value visitComparer(SQLParser.ComparerContext ctx) {
         if (ctx.column_full_name() != null) {
-            return new Value(visitColumn_full_name(ctx.column_full_name()));
+            return new Value(ctx.column_full_name().getText().toLowerCase(), ValueType.COLUMN);
         } else {
             return visitLiteral_value(ctx.literal_value());
         }
@@ -459,7 +468,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         List<String> columns = new ArrayList<>();
 
         for (SQLParser.Column_nameContext columnNameContext : ctx.column_name()) {
-            columns.add(columnNameContext.getText());
+            columns.add(visitColumn_name(columnNameContext));
         }
         return columns;
     }
@@ -530,7 +539,10 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     */
     @Override
     public Column visitColumn_full_name(SQLParser.Column_full_nameContext ctx) {
-        String tableName = visitTable_name(ctx.table_name());
+        String tableName = null;
+        if (ctx.table_name() != null) {
+            tableName = visitTable_name(ctx.table_name());
+        }
         String columnName = visitColumn_name(ctx.column_name());
         return new Column(columnName, tableName);
     }
@@ -550,7 +562,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
      */
     @Override
     public String visitTable_name(SQLParser.Table_nameContext ctx) {
-        return ctx.IDENTIFIER().getText();
+        return ctx.IDENTIFIER().getText().toLowerCase();
     }
 
     /*

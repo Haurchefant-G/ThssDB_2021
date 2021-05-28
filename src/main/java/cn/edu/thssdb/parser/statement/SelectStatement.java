@@ -7,26 +7,26 @@ import cn.edu.thssdb.schema.Column;
 import java.util.List;
 
 public class SelectStatement extends Statement {
-    List<Column> columns;
+    List<String> columnNames;
     List<TableQuery> tableQueries;
-    Where condition;
+    Where where;
     boolean distinct;
 
-    public SelectStatement(List<Column> columns, List<TableQuery> tableQueries, Where condition, boolean distinct) {
-        this.columns = columns;
+    public SelectStatement(List<String> columnNames, List<TableQuery> tableQueries, Where where, boolean distinct) {
+        this.columnNames = columnNames;
         this.tableQueries = tableQueries;
-        this.condition = condition;
+        this.where = where;
         this.distinct = distinct;
     }
 
     public StatementType getType() { return StatementType.SELECT; }
 
-    public List<Column> getColumns() {
-        return columns;
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
+    public void setColumnNames(List<String> columnNames) {
+        this.columnNames = columnNames;
     }
 
     public List<TableQuery> getTableQueries() {
@@ -37,12 +37,12 @@ public class SelectStatement extends Statement {
         this.tableQueries = tableQueries;
     }
 
-    public Where getCondition() {
-        return condition;
+    public Where getWhere() {
+        return where;
     }
 
-    public void setCondition(Where condition) {
-        this.condition = condition;
+    public void setWhere(Where where) {
+        this.where = where;
     }
 
     public boolean isDistinct() {

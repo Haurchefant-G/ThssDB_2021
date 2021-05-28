@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Table implements Iterable<Row> {
-  ReentrantReadWriteLock lock;
+  ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
@@ -41,7 +41,7 @@ public class Table implements Iterable<Row> {
       for (List<Value> colValues : values) {
         if (insertAll && columns.size() != colValues.size()) {
           throw new InsertColumnSizeNotMatchException(columns.size(), colValues.size());
-        } else if (colNum != colValues.size()) {
+        } else if (!insertAll && colNum != colValues.size()) {
           throw new InsertColumnSizeNotMatchException(colNum, colValues.size());
         }
 
@@ -105,6 +105,7 @@ public class Table implements Iterable<Row> {
       List<MetaInfo> metaInfos = new ArrayList<MetaInfo>() {{
         add(getMetaInfo());
       }};
+
       Predicate<Row> predicate = null;
       if (condition != null) {
         predicate = condition.parse(metaInfos);
@@ -352,7 +353,7 @@ public class Table implements Iterable<Row> {
     indexOutput.close();
   }
 
-  boolean hasKey(Entry key) {
+  public boolean hasKey(Entry key) {
     try {
       lock.readLock().lock();
       return index.contains(key);

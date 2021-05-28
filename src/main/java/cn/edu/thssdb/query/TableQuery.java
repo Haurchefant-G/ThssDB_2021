@@ -26,4 +26,6 @@ public class TableQuery {
     public Where getWhere() {
         return where;
     }
+
+
 }

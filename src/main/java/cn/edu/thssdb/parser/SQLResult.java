@@ -10,15 +10,6 @@ public class SQLResult {
     boolean isAbort;
     boolean hasResult;
 
-    public SQLResult(String msg, List<String> columnList, List<List<String>> rowList, boolean succeed, boolean isAbort, boolean hasResult) {
-        this.msg = msg;
-        this.columnList = columnList;
-        this.rowList = rowList;
-        this.succeed = succeed;
-        this.isAbort = isAbort;
-        this.hasResult = hasResult;
-    }
-
     public SQLResult(String msg, boolean succeed) {
         this.msg = msg;
         this.succeed = succeed;

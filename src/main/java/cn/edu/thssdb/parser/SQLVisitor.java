@@ -58,11 +58,11 @@ public interface SQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLParser#show_meta_stmt}.
+	 * Visit a parse tree produced by {@link SQLParser#show_table_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitShow_meta_stmt(SQLParser.Show_meta_stmtContext ctx);
+	T visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLParser#grant_stmt}.
 	 * @param ctx the parse tree
@@ -106,11 +106,11 @@ public interface SQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitQuit_stmt(SQLParser.Quit_stmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLParser#show_table_stmt}.
+	 * Visit a parse tree produced by {@link SQLParser#show_tables_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx);
+	T visitShow_tables_stmt(SQLParser.Show_tables_stmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLParser#insert_stmt}.
 	 * @param ctx the parse tree

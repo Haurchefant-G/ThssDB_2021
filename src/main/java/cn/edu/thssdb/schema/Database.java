@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.TableExistException;
 import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
@@ -87,6 +88,9 @@ public class Database {
   public void create(String name, ArrayList<Column> columns) {
     // TODO
     lock.writeLock().lock();
+    if (tables.containsKey(name)) {
+      throw new TableExistException(name, this.name);
+    }
     Table table = new Table(this.name, name, columns);
     tables.put(name, table);
     persist();
@@ -119,12 +123,6 @@ public class Database {
     File f = new File(name + ".db");
     f.delete();
     lock.writeLock().unlock();
-  }
-
-  public String select(QueryTable[] queryTables) {
-    // TODO
-    QueryResult queryResult = new QueryResult(queryTables);
-    return null;
   }
 
   /**
@@ -248,11 +246,6 @@ public class Database {
     }
   }
 
-  public QueryTable getTabelQuery(String tablename) {
-    Table table = tables.get(tablename);
-    return new QueryTable(table);
-  }
-
   public void commitTable(String tablename) {
     tables.get(tablename).commit();
   }
@@ -262,7 +255,7 @@ public class Database {
     return tables;
   }
 
-  Table getTable(String tableName) {
+  public Table getTable(String tableName) {
     try {
       lock.readLock().lock();
       Table table = tables.get(tableName);
@@ -275,13 +268,12 @@ public class Database {
     }
   }
 
-  public QueryResult select(List<QueryTable> queryTables, List<Column> columns, Where condition, boolean distinct) {
+  public QueryResult select(List<QueryTable> queryTables, List<String> columnNames, Where where, boolean distinct) {
     try {
       lock.readLock().lock();
-      QueryResult queryResult = new QueryResult(queryTables, columns, condition, distinct);
+      return new QueryResult(queryTables, columnNames, where, distinct);
     } finally {
       lock.readLock().unlock();
     }
-    return null;
   }
 }

@@ -1,7 +1,10 @@
 package cn.edu.thssdb.parser;
 
 import cn.edu.thssdb.parser.statement.*;
+import cn.edu.thssdb.query.QueryResult;
+import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.schema.Row;
 import cn.edu.thssdb.server.Session;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.CharStream;
@@ -9,11 +12,13 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class SQLProcessor {
     Manager manager;
+
 
     public SQLProcessor(Manager manager) {
         this.manager = manager;
@@ -30,7 +35,7 @@ public class SQLProcessor {
             return (List<Statement>) visitor.visit(tree);
         }
         catch (Exception e) {
-            return null;
+            throw e;
         }
     }
 
@@ -73,7 +78,7 @@ public class SQLProcessor {
     }
 
     // DATABASE
-    private SQLResult createDatabase(CreateDatabaseStatement statement, Session session) {
+    public SQLResult createDatabase(CreateDatabaseStatement statement, Session session) {
         try {
             manager.createDatabaseIfNotExists(statement.getDatabaseName());
             return new SQLResult("Database " + statement.getDatabaseName() + " Created.", true);
@@ -82,7 +87,7 @@ public class SQLProcessor {
         }
     }
 
-    private SQLResult useDatabase(UseDatabaseStatement statement, Session session) {
+    public SQLResult useDatabase(UseDatabaseStatement statement, Session session) {
         try {
             manager.switchDatabase(statement.getDatabaseName(), session);
             return new SQLResult("Switch to Database " + statement.getDatabaseName(), true);
@@ -91,11 +96,23 @@ public class SQLProcessor {
         }
     }
 
-    private SQLResult showDatabase(ShowDatabasesStatement statement, Session session) {
+    public SQLResult showDatabase(ShowDatabasesStatement statement, Session session) {
         return null;
     }
 
-    private SQLResult dropDatabase(DropDatabaseStatement statement, Session session) {
+    public SQLResult showTables(ShowTablesStatement statement, Session session) {
+        try {
+            List<String> heads = Arrays.asList("Table Name");
+            List<String> tableNames = manager.getTables(statement.getDatabaseName(), session);
+            List<List<String>> stackTableNames = tableNames.stream().map(Arrays::asList).collect(Collectors.toList());
+
+            return new SQLResult("Show tables", heads, stackTableNames, true);
+        } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
+    }
+
+    public SQLResult dropDatabase(DropDatabaseStatement statement, Session session) {
         try {
             manager.deleteDatabase(statement.getDatabaseName(), session);
             return new SQLResult("Delete Database " + statement.getDatabaseName(), true);
@@ -104,16 +121,19 @@ public class SQLProcessor {
         }
     }
 
-    private SQLResult showTableMeta(ShowTableMetaStatement statement, Session session) {
+    public SQLResult showTableMeta(ShowTableMetaStatement statement, Session session) {
         try {
-            return manager.getTableMeta(statement.getTableName() ,session);
+            List<String> heads = Arrays.asList("Field", "Data Type", "Not Null", "Primary Key");
+            List<List<String>> tableMeta = manager.getTableMeta(statement.getTableName() ,session);
+            return new SQLResult("Table " + statement.getTableName() + " meta.", heads, tableMeta, true);
+
         } catch (Exception e) {
             return new SQLResult(e.getMessage(), false);
         }
     }
 
     // TABLE
-    private SQLResult dropTable(DropTableStatement statement, Session session) {
+    public SQLResult dropTable(DropTableStatement statement, Session session) {
         try {
             manager.dropTable(statement.getTableName(), session);
             return new SQLResult("Delete Table " + statement.getTableName(), true);
@@ -122,11 +142,7 @@ public class SQLProcessor {
         }
     }
 
-    private SQLResult showTables(ShowTablesStatement statement, Session session) {
-        return null;
-    }
-
-    private SQLResult createTable(CreateTableStatement statement, Session session) {
+    public SQLResult createTable(CreateTableStatement statement, Session session) {
         try {
             manager.createTable(statement.getTableName(), statement.getColumnList(), session);
             return new SQLResult("Create Table " + statement.getTableName(), true);
@@ -137,17 +153,17 @@ public class SQLProcessor {
 
 
     // 用户
-    private SQLResult dropUser(DropUserStatement statement, Session session) {
+    public SQLResult dropUser(DropUserStatement statement, Session session) {
         return null;
     }
 
-    private SQLResult createUser(CreateUserStatement statement, Session session) {
+    public SQLResult createUser(CreateUserStatement statement, Session session) {
         return null;
     }
 
 
     // 增删查改
-    private SQLResult insert(InsertStatement statement, Session session) {
+    public SQLResult insert(InsertStatement statement, Session session) {
         try {
             manager.insert(statement.getTableName(), statement.getColumnNames(), statement.getValues(), session);
             return new SQLResult("Insert succeed", true);
@@ -156,24 +172,34 @@ public class SQLProcessor {
         }
     }
 
-    private SQLResult select(SelectStatement statement, Session session) {
+    public SQLResult select(SelectStatement statement, Session session) {
         try {
-            return manager.select(statement.getColumns(), statement.getTableQueries(), statement.getCondition(), statement.isDistinct(), session);
+            QueryResult queryResult = manager.select(statement.getColumnNames(), statement.getTableQueries(), statement.getWhere(), statement.isDistinct(), session);
+            List<String> columnNames = queryResult.getColumnNames();
+            List<Row> rows = queryResult.getResults();
+
+            List<List<String>> stringRows = new ArrayList<>();
+            for (Row row : rows) {
+                List<String> stringRow = row.getEntries().stream().map(Entry::toString).collect(Collectors.toList());
+                stringRows.add(stringRow);
+            }
+
+            return new SQLResult("Select succeed", columnNames, stringRows,true);
         } catch (Exception e) {
-            return new SQLResult(e.getMessage(), false);
+            return new SQLResult(e.getMessage(),false);
         }
     }
 
-    private SQLResult delete(DeleteStatement statement, Session session) {
+    public SQLResult delete(DeleteStatement statement, Session session) {
         try {
-            int rowNum = manager.delete(statement.getTableName(), statement.getCondition(), session);
+            int rowNum = manager.delete(statement.getTableName(), statement.getWhere(), session);
             return new SQLResult(rowNum + " row is deleted.", true);
         } catch (Exception e) {
             return new SQLResult(e.getMessage(), false);
         }
     }
 
-    private SQLResult update(UpdateStatement statement, Session session) {
+    public SQLResult update(UpdateStatement statement, Session session) {
         try {
             int rolNum = manager.update(statement.getTableName(), statement.getColumnName(), statement.getExpression(), statement.getCondition(), session);
             return new SQLResult(rolNum + " row is updated.", true);

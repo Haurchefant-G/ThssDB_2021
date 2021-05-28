@@ -18,6 +18,18 @@ public class Condition {
         this.comparator = comparator;
     }
 
+    public Expression getLeft() {
+        return left;
+    }
+
+    public Expression getRight() {
+        return right;
+    }
+
+    public Comparator getComparator() {
+        return comparator;
+    }
+
     public Predicate<Row> parse(List<MetaInfo> metaInfoList) {
         Function<Row, Comparable> expr1 = left.parse(metaInfoList);
         Function<Row, Comparable> expr2 = right.parse(metaInfoList);

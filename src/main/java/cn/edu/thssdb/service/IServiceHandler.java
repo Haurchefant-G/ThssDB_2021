@@ -12,16 +12,12 @@ import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.parser.SQLResult;
 import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.utils.Global;
-import cn.edu.thssdb.utils.ServerSQLVisitor;
 import org.apache.thrift.TException;
 
 import java.util.Date;
 import java.util.List;
 
 public class IServiceHandler implements IService.Iface {
-
-  ServerSQLVisitor ServerSql = new ServerSQLVisitor();
-
   @Override
   public GetTimeResp getTime(GetTimeReq req) throws TException {
     GetTimeResp resp = new GetTimeResp();

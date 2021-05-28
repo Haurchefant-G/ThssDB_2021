@@ -59,7 +59,7 @@ public class Manager {
     }
   }
 
-  private Session getSession(long sessionId) {
+  public Session getSession(long sessionId) {
     for (Session session: sessionList) {
       if (session.getSessionId() == sessionId) {
         return session;
@@ -110,12 +110,12 @@ public class Manager {
       }
 
       for (Session session1 : sessionList) {
-        if (session1 != session && name.equals(session1.getDatabase().getName())) {
+        if (session1 != session && name.equals(session1.getDatabaseName())) {
           throw new DatabaseBeingUsedException(name);
         }
       }
 
-      if (name.equals(session.getDatabase().getName())) {
+      if (name.equals(session.getDatabaseName())) {
         session.setDatabase(null);
       }
 
@@ -131,7 +131,7 @@ public class Manager {
    * @param name 数据库名
    */
   public void switchDatabase(String name, Session session) {
-    if (name.equals(session.getDatabase().getName())) {
+    if (name.equals(session.getDatabaseName())) {
       return;
     }
 
@@ -213,19 +213,17 @@ public class Manager {
     }
   }
 
-  public SQLResult getTableMeta(String tableName, Session session) {
+  public List<List<String>> getTableMeta(String tableName, Session session) {
     Database database = session.getDatabase();
     try {
       database.lock.readLock().lock();
       Table table = database.getTable(tableName);
 
-      List<String> heads = Arrays.asList("Field", "Data Type", "Not Null", "Primary Key");
-
       List<List<String>> tableMeta = new ArrayList<>();
       for (Column column : table.columns) {
         tableMeta.add(column.getMetaList());
       }
-      return new SQLResult("Show Table " + tableName + " Meta", heads, tableMeta, true);
+      return tableMeta;
     } finally {
       database.lock.readLock().unlock();
     }
@@ -235,10 +233,6 @@ public class Manager {
       Database database = session.getDatabase();
       try {
         database.lock.writeLock().lock();
-        Table table = database.getTable(tableName);
-        if (table != null) {
-          throw new TableExistException(tableName);
-        }
         database.create(tableName, columns);
       } finally {
         database.lock.writeLock().unlock();
@@ -282,13 +276,10 @@ public class Manager {
     table.insert(columnNames, values);
   }
 
-  public SQLResult select(List<Column> columns, List<TableQuery> tableQueries, Where condition, boolean distinct, Session session) {
-    // TODO: support multiple join
+  public QueryResult select(List<String> columnNames, List<TableQuery> tableQueries, Where condition, boolean distinct, Session session) {
     Database database = session.getDatabase();
     List<QueryTable> queryTables = tableQueries.stream().map(tableQuery -> getQueryTable(tableQuery, session)).collect(Collectors.toList());
-    QueryResult queryResult = database.select(queryTables, columns, condition, distinct);
-
-    return null;
+    return database.select(queryTables, columnNames, condition, distinct);
   }
 
   public int delete(String tableName, Where condition, Session session) {
@@ -301,6 +292,14 @@ public class Manager {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
     return table.update(columnName, expression, condition);
+  }
+
+  public List<String> getTables(String databaseName, Session session) {
+    if (databaseName == null) {
+      databaseName = session.getDatabaseName();
+    }
+    Database database = databases.get(databaseName);
+    return Arrays.asList(database.getTables().keySet().toArray(new String[0]));
   }
 
   public static class ManagerHolder {

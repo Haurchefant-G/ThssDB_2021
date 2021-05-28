@@ -8,7 +8,7 @@ public class Session {
     long sessionId;
     boolean autoCommit;
     Database database;
-    ReentrantReadWriteLock lock;
+    ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Session(long sessionId) {
         this.sessionId = sessionId;
@@ -32,6 +32,13 @@ public class Session {
 
     public Database getDatabase() {
         return database;
+    }
+
+    public String getDatabaseName() {
+        if (database == null) {
+            return null;
+        }
+        return database.getName();
     }
 
     public void setDatabase(Database database) {

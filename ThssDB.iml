@@ -16,7 +16,7 @@
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.8-1" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.9" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr4:4.5" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:ST4:4.0.8" level="project" />

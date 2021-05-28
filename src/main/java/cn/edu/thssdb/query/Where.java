@@ -37,4 +37,19 @@ public class Where {
         }
     }
 
+    public Where getLeft() {
+        return left;
+    }
+
+    public Where getRight() {
+        return right;
+    }
+
+    public ConditionOp getOp() {
+        return op;
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
 }

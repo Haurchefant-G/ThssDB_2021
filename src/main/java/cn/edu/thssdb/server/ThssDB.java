@@ -23,7 +23,7 @@ public class ThssDB {
   private static TServerSocket transport;
   private static TServer server;
 
-  private static Manager manager;
+  private static Manager manager = Manager.getInstance();
 
   private static long sessionNumber = 0;
 
@@ -39,7 +39,6 @@ public class ThssDB {
 //    SQLParser parser = new SQLParser(token);
 //    SQLParser.ParseContext context = parser.parse();
 //    logger.info(context.toStringTree());
-    manager = Manager.getInstance();
     logger.info("recoverMeta");
     ThssDB server = ThssDB.getInstance();
     server.start();

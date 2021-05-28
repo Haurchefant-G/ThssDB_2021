@@ -4,11 +4,11 @@ import cn.edu.thssdb.query.Where;
 
 public class DeleteStatement extends Statement {
     String tableName;
-    Where condition;
+    Where where;
 
     public DeleteStatement(String tableName, Where condition) {
         this.tableName = tableName;
-        this.condition = condition;
+        this.where = condition;
     }
 
     public String getTableName() {
@@ -19,12 +19,12 @@ public class DeleteStatement extends Statement {
         this.tableName = tableName;
     }
 
-    public Where getCondition() {
-        return condition;
+    public Where getWhere() {
+        return where;
     }
 
-    public void setCondition(Where condition) {
-        this.condition = condition;
+    public void setWhere(Where where) {
+        this.where = where;
     }
 
     public StatementType getType() { return StatementType.DELETE; }

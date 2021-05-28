@@ -39,6 +39,10 @@ public class Expression {
         return op;
     }
 
+    public Value getValue() {
+        return value;
+    }
+
     public boolean isTerminal() { return right == null; }
 
     public Function<Row, Comparable> parse(List<MetaInfo> metaInfoList) {

@@ -72,7 +72,7 @@ public class SQLBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements SQ
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitShow_meta_stmt(SQLParser.Show_meta_stmtContext ctx) { return visitChildren(ctx); }
+	@Override public T visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -128,7 +128,7 @@ public class SQLBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements SQ
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitShow_table_stmt(SQLParser.Show_table_stmtContext ctx) { return visitChildren(ctx); }
+	@Override public T visitShow_tables_stmt(SQLParser.Show_tables_stmtContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
