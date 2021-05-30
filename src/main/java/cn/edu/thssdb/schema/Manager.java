@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class Manager {
   private final HashMap<String, Database> databases;
   private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  public TransactionManager transactionManager;
   private final SQLProcessor sqlProcessor = new SQLProcessor(this);
 
   public static Database selectDatabase;
@@ -42,6 +43,8 @@ public class Manager {
     sessionList = new ArrayList<Session>();
     recoverMeta();
     createDatabaseIfNotExists("Default");
+    
+    transactionManager = new TransactionManager();
   }
 
   public void addSession(long sessionId) {
@@ -68,16 +71,148 @@ public class Manager {
     return null;
   }
 
+  public void check_WAL(List<Statement> statementList, Session session, String sql) {
+    for (Statement statement : statementList)
+    {
+      if (statement.getType().equals(StatementType.INSERT) ||
+          statement.getType().equals(StatementType.DELETE) ||
+          statement.getType().equals(StatementType.UPDATE) ||
+          statement.getType().equals(StatementType.SELECT) ||
+          statement.getType().equals(StatementType.BEGIN_TRANSACTION) ||
+          statement.getType().equals(StatementType.COMMIT))
+          write_log(session, sql);
+    }
+  }
+
+  /**
+   * check INSERT, DELETE, UPDATE, SELECT for WAL
+   */
   public List<SQLResult> execute(String sql, long sessionId) {
     Session session = getSession(sessionId);
     if (session == null) {
-        return Collections.singletonList(new SQLResult("Invalid session Id.", false));
+      return Collections.singletonList(new SQLResult("Invalid session Id.", false));
     }
-    List<Statement> statementList = sqlProcessor.parseSQL(sql);
+    List<Statement> statementList = new ArrayList<>();
+
+    String[] sqls = sql.split(";");
+    int size = sqls.length;
+    for (int i = 0; i < sqls.length; i++)
+    {
+      List<Statement> tmp = sqlProcessor.parseSQL(sqls[i]);
+      check_WAL(tmp, session, sqls[i]);
+      statementList.addAll(tmp);
+    }
+
     if (statementList == null || statementList.size() == 0) {
       return Collections.singletonList(new SQLResult("No sql command is parsed.", false));
     }
+
     return sqlProcessor.executeSQL(statementList, session);
+  }
+
+  public List<SQLResult> directly_execute(String sql, long sessionId) {
+    Session session = getSession(sessionId);
+    if (session == null) {
+      return Collections.singletonList(new SQLResult("Invalid session Id.", false));
+    }
+    List<Statement> statementList = sqlProcessor.parseSQL(sql);
+
+    if (statementList == null || statementList.size() == 0) {
+      return Collections.singletonList(new SQLResult("No sql command is parsed.", false));
+    }
+
+    return sqlProcessor.executeSQL(statementList, session);
+  }
+
+  public void write_log(Session session, String sql)
+  {
+    try
+    {
+      Database database = session.getDatabase();
+      String db_name = database.getName();
+      String filename = db_name + ".log";
+
+      FileWriter writer = new FileWriter(filename,true);
+      writer.write(sql + ";\n");
+      writer.close();
+    } catch (IOException e) {
+    }
+  }
+
+  public Integer cal_last_cmd(ArrayList<Integer> begin_transcation_list,
+                              ArrayList<Integer> commit_list,
+                              ArrayList<String> lines) {
+    Integer last_cmd = 0;
+    if (begin_transcation_list.size() == commit_list.size())
+      last_cmd = lines.size();
+    else
+      last_cmd = begin_transcation_list.get(begin_transcation_list.size() - 1);
+
+    return last_cmd;
+  }
+
+  public void rewrite_log(String filename, ArrayList<String> lines, Integer index) {
+    try {
+      FileWriter writer1 = new FileWriter(filename);
+      writer1.write("");
+      writer1.close();
+
+      FileWriter writer2 = new FileWriter(filename, true);
+      for (int i = 0; i < index; i++)
+        writer2.write(lines.get(i) + "\n");
+      writer2.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void read_log(Session session)
+  {
+    String db_name = session.getDatabase().getName();
+    String filename = db_name + ".log";
+    long session_id = session.getSessionId();
+
+    File file = new File(filename);
+    if(file.exists() && file.isFile())
+    {
+      directly_execute("use " + db_name, session_id);
+
+      try {
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<Integer> begin_transcation_list = new ArrayList<>();
+        ArrayList<Integer> commit_list = new ArrayList<>();
+        String line;
+        int index = 0;
+
+        while ((line = bufferedReader.readLine()) != null)
+        {
+          if (line.equals("begin transaction;"))
+            begin_transcation_list.add(index);
+          else if (line.equals("commit;"))
+            commit_list.add(index);
+
+          lines.add(line);
+          index++;
+        }
+        reader.close();
+        bufferedReader.close();
+
+
+        Integer last_cmd = cal_last_cmd(begin_transcation_list, commit_list, lines);
+        for (int i = 0; i < last_cmd; i++)
+          directly_execute(lines.get(i), session_id);
+
+        if (begin_transcation_list.size() != commit_list.size())
+          rewrite_log(filename, lines, last_cmd);
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
@@ -189,6 +324,11 @@ public class Manager {
         SQLParser parser = new SQLParser(token);
         Database database = databaseMeta.visitCreate_db_stmt(parser.create_db_stmt());
         databases.put(database.getName(), database);
+        
+        Session session = new Session(-1);
+        session.setDatabase(database);
+        read_log(session);
+        
         line = br.readLine();
       }
       fr.close();
@@ -270,28 +410,125 @@ public class Manager {
     }
   }
 
-  public void insert(String tableName, List<String> columnNames, List<List<Value>> values, Session session) throws IOException {
+  public int insert(String tableName, List<String> columnNames, List<List<Value>> values, Session session) throws IOException {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
-    table.insert(columnNames, values);
+
+    long session_id = session.getSessionId();
+    if (transactionManager.contain_session(session_id))
+    {
+      transactionManager.wait_for_write(session_id, table);
+      table.insert(columnNames, values);
+
+      return 1;
+    }
+    else
+      return -1;
+  }
+
+  public ArrayList<Table> getTables(List<TableQuery> tableQueries, Session session) {
+    Database database = session.getDatabase();
+
+    try {
+      database.lock.readLock().lock();
+
+      int size = tableQueries.size();
+      ArrayList<Table> tables = new ArrayList<>();
+      ArrayList<String> table_names = new ArrayList<>();
+      for (int i = 0; i < size; i++)
+      {
+        TableQuery tableQuery = tableQueries.get(i);
+        table_names.add(tableQuery.getTableLeft());
+        if (tableQuery.getTableRight() != null)
+          table_names.add(tableQuery.getTableRight());
+      }
+
+      ArrayList<String> new_table_names = new ArrayList<String>(new HashSet<String>(table_names));
+      int new_size = new_table_names.size();
+      for (int i = 0; i < size; i++)
+        tables.add(database.getTable(new_table_names.get(i)));
+
+      return tables;
+    } finally {
+      database.lock.readLock().unlock();
+    }
   }
 
   public QueryResult select(List<String> columnNames, List<TableQuery> tableQueries, Where condition, boolean distinct, Session session) {
     Database database = session.getDatabase();
     List<QueryTable> queryTables = tableQueries.stream().map(tableQuery -> getQueryTable(tableQuery, session)).collect(Collectors.toList());
-    return database.select(queryTables, columnNames, condition, distinct);
+
+    long session_id = session.getSessionId();
+    if (transactionManager.contain_session(session_id))
+    {
+      transactionManager.wait_for_read(session_id, getTables(tableQueries, session));
+
+      return database.select(queryTables, columnNames, condition, distinct);
+    }
+    else
+      return null;
   }
 
   public int delete(String tableName, Where condition, Session session) {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
-    return table.delete(condition);
+
+    long session_id = session.getSessionId();
+    if (transactionManager.contain_session(session_id))
+    {
+      transactionManager.wait_for_write(session_id, table);
+      return table.delete(condition);
+    }
+    else
+      return -1;
   }
 
   public int update(String tableName, String columnName, Expression expression, Where condition, Session session) {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
-    return table.update(columnName, expression, condition);
+
+    long session_id = session.getSessionId();
+    if (transactionManager.contain_session(session_id))
+    {
+      transactionManager.wait_for_write(session_id, table);
+      return table.update(columnName, expression, condition);
+    }
+    else
+      return -1;
+  }
+
+  public boolean begin_transaction(Session session) {
+    long session_id = session.getSessionId();
+    if (!transactionManager.contain_session(session_id))
+    {
+      transactionManager.add_session(session_id);
+      transactionManager.put_S_lock(session_id, new ArrayList<>());
+      transactionManager.put_X_lock(session_id, new ArrayList<>());
+
+      return true;
+    }
+    else
+      return false;
+  }
+
+  public boolean commit(Session session) {
+    long session_id = session.getSessionId();
+    if (transactionManager.contain_session(session_id))
+    {
+      Database database = session.getDatabase();
+      String db_name = database.getName();
+      transactionManager.remove_session(session_id);
+
+      ArrayList<String> table_list = transactionManager.get_X_lock(session_id);
+      for (String table_name : table_list)
+        database.getTable(table_name).free_X_lock(session_id);
+      table_list.clear();
+      transactionManager.put_X_lock(session_id, table_list);
+
+      return true;
+    }
+    else
+      return false;
   }
 
   public List<String> getTables(String databaseName, Session session) {
