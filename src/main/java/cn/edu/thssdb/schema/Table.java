@@ -30,6 +30,11 @@ public class Table implements Iterable<Row> {
   public BPlusTree<Entry, Row> index;
   private int primaryIndex;
   private FileStorage fileStorage;
+  
+  LockType lockType;
+  public ArrayList<Long> S_lock;
+  public ArrayList<Long> X_lock;
+  
 
   public void insert(List<String> columnNames, List<List<Value>> values) throws IOException {
     try {
@@ -167,6 +172,10 @@ public class Table implements Iterable<Row> {
         this.primaryIndex = i;
       }
     }
+    this.S_lock = new ArrayList<Long>();
+    this.X_lock = new ArrayList<Long>();
+    this.lockType = LockType.NONE;
+    
     try {
       recover();
     } catch (IOException e) {
@@ -174,6 +183,71 @@ public class Table implements Iterable<Row> {
     }
   }
 
+  public int add_S_lock(long session){
+    if (lockType.equals(LockType.X))
+    {
+      if (X_lock.contains(session))
+        return 0;
+      else
+        return -1;
+    }
+    else if(lockType.equals(LockType.S))
+    {
+      if (S_lock.contains(session))
+        return 0;
+      else
+      {
+        S_lock.add(session);
+        lockType = LockType.S;
+        return 1;
+      }
+    }
+    else
+    {
+      S_lock.add(session);
+      lockType = LockType.S;
+      return 1;
+    }
+  }
+
+  public int add_X_lock(long session){
+    if(lockType.equals(LockType.X))
+    {
+      if(X_lock.contains(session))
+        return 0;
+      else
+        return -1;
+    }
+    else if(lockType.equals(LockType.S))
+      return -1;
+    else {
+      X_lock.add(session);
+      lockType = LockType.X;
+      return 1;
+    }
+  }
+
+  public void free_S_lock(long session){
+    if(S_lock.contains(session))
+    {
+      S_lock.remove(session);
+
+      if(S_lock.size() == 0)
+        lockType = LockType.NONE;
+      else
+        lockType = LockType.S;
+    }
+  }
+
+  public void free_X_lock(long session){
+    if(X_lock.contains(session))
+    {
+      X_lock.remove(session);
+
+      lockType = LockType.NONE;
+    }
+  }
+  
   /**
    * 设置表所在的数据库
    * @param name 数据库名
@@ -208,6 +282,10 @@ public class Table implements Iterable<Row> {
         this.primaryIndex = i;
       }
     }
+    this.S_lock = new ArrayList<Long>();
+    this.X_lock = new ArrayList<Long>();
+    this.lockType = LockType.NONE;
+    
     try {
       recover();
     } catch (IOException e) {
