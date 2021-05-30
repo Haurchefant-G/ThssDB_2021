@@ -307,6 +307,24 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
     }
 
     /*
+    begin_transaction_stmt :
+        K_BEGIN K_TRANSACTION;
+    */
+    @Override
+    public Object visitBegin_transaction_stmt(SQLParser.Begin_transaction_stmtContext ctx) {
+        return new BeginTransactionStatement();
+    }
+
+    /*
+    commit_stmt :
+        K_COMMIT;
+    */
+    @Override
+    public Object visitCommit_stmt(SQLParser.Commit_stmtContext ctx) {
+        return new CommitStatement();
+    }
+
+    /*
     column_def :
         column_name type_name column_constraint* ;
      */

@@ -2,15 +2,16 @@ package cn.edu.thssdb.parser;
 
 import cn.edu.thssdb.parser.statement.*;
 import cn.edu.thssdb.query.QueryResult;
-import cn.edu.thssdb.schema.Entry;
-import cn.edu.thssdb.schema.Manager;
-import cn.edu.thssdb.schema.Row;
+import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.server.Session;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,7 +71,12 @@ public class SQLProcessor {
                 results.add(update((UpdateStatement) statement, session));
             } else if (statement.getType() == StatementType.DELETE) {
                 results.add(delete((DeleteStatement) statement, session));
-            } else {
+            } else if (statement.getType() == StatementType.BEGIN_TRANSACTION) {
+                results.add(begin_transaction(session));
+            } else if (statement.getType() == StatementType.COMMIT) {
+                results.add(commit(session));
+            }
+            else {
 
             }
         }
@@ -165,7 +171,10 @@ public class SQLProcessor {
     // 增删查改
     public SQLResult insert(InsertStatement statement, Session session) {
         try {
-            manager.insert(statement.getTableName(), statement.getColumnNames(), statement.getValues(), session);
+            int res = manager.insert(statement.getTableName(), statement.getColumnNames(), statement.getValues(), session);
+            if (res == -1)
+                return new SQLResult("transaction is not going on", false);
+
             return new SQLResult("Insert succeed", true);
         } catch (Exception e) {
             return new SQLResult(e.getMessage(), false);
@@ -193,6 +202,8 @@ public class SQLProcessor {
     public SQLResult delete(DeleteStatement statement, Session session) {
         try {
             int rowNum = manager.delete(statement.getTableName(), statement.getWhere(), session);
+            if (rowNum == -1)
+                return new SQLResult("transaction is not going on", false);
             return new SQLResult(rowNum + " row is deleted.", true);
         } catch (Exception e) {
             return new SQLResult(e.getMessage(), false);
@@ -201,9 +212,40 @@ public class SQLProcessor {
 
     public SQLResult update(UpdateStatement statement, Session session) {
         try {
-            int rolNum = manager.update(statement.getTableName(), statement.getColumnName(), statement.getExpression(), statement.getCondition(), session);
-            return new SQLResult(rolNum + " row is updated.", true);
+            int rowNum = manager.update(statement.getTableName(), statement.getColumnName(), statement.getExpression(), statement.getCondition(), session);
+            if (rowNum == -1)
+                return new SQLResult("transaction is not going on", false);
+
+            return new SQLResult(rowNum + " row is updated.", true);
         } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
+    }
+
+    /**
+   * begin transaction
+   */
+    public SQLResult begin_transaction(Session session) {
+        try{
+            if (manager.begin_transaction(session))
+                return new SQLResult("begin transaction.", true);
+            else
+                return new SQLResult("transaction is going on", false);
+        } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
+    }
+
+    /**
+    commit
+     */
+    public SQLResult commit(Session session) {
+        try{
+            if (manager.commit(session))
+                return new SQLResult("commit.", true);
+            else
+                return new SQLResult("transaction is not going on", false);
+        } catch (Exception e){
             return new SQLResult(e.getMessage(), false);
         }
     }

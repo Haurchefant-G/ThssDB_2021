@@ -18,4 +18,7 @@ public enum StatementType {
     SELECT,
     UPDATE,
     DELETE,
+
+    BEGIN_TRANSACTION,
+    COMMIT,
 }
