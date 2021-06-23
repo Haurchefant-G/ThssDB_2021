@@ -44,7 +44,6 @@ public class IServiceHandler implements IService.Iface {
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
     ThssDB thssDB = ThssDB.getInstance();
-    System.out.println("收到了");
     List<SQLResult> results = thssDB.execute(req.getStatement(), req.sessionId);
     SQLResult result = results.get(0);
     Status status = result.isSucceed() ? new Status(Global.SUCCESS_CODE) : new Status(Global.FAILURE_CODE);
