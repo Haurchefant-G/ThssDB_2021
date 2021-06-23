@@ -166,6 +166,40 @@ public class MySQLProcessorTest {
         assert manger.getDatabase("test").getTables().containsKey("person");
     }
 
+    /**
+     begin_transaction_stmt :
+        K_BEGIN K_TRANSACTION;
+    */
+    public void testBegin_transaction() {
+        String sql = "begin transaction;";
+        BeginTransactionStatement statement = (BeginTransactionStatement) sqlProcessor.parseSQL(sql).get(0);
+        assert statement.getType() == StatementType.BEGIN_TRANSACTION;
+
+        Integer size1 = manger.transactionManager.get_session_size();
+        SQLResult sqlResult = sqlProcessor.begin_transaction(session);
+        assert sqlResult.isSucceed();
+
+        Integer size2 = manger.transactionManager.get_session_size();
+        assert (size2-size1 == 1);
+    }
+
+    /**
+     commit_stmt:
+     K_COMMIT ;
+     */
+    public void testCommit() {
+        String sql = "commit;";
+        CommitStatement statement = (CommitStatement) sqlProcessor.parseSQL(sql).get(0);
+        assert statement.getType() == StatementType.COMMIT;
+
+        Integer size1 = manger.transactionManager.get_session_size();
+        SQLResult sqlResult = sqlProcessor.commit(session);
+        assert sqlResult.isSucceed();
+
+        Integer size2 = manger.transactionManager.get_session_size();
+        assert (size1-size2 == 1);
+    }
+
     /*
     insert_stmt :
         K_INSERT K_INTO table_name ( '(' column_name ( ',' column_name )* ')' )?
@@ -174,6 +208,7 @@ public class MySQLProcessorTest {
     @Test
     public void testInsert() {
         testCreateTable();
+        testBegin_transaction();
 
         String sql = "insert into person (name, age) values ('liqi', 20), ('guiacan', 21);";
         InsertStatement statement = (InsertStatement) sqlProcessor.parseSQL(sql).get(0);
@@ -192,6 +227,8 @@ public class MySQLProcessorTest {
 
         assert table.hasKey(new Entry("'liqi'"));
         assert table.hasKey(new Entry("'guiacan'"));
+
+        testCommit();
     }
 
     /*
@@ -202,6 +239,7 @@ public class MySQLProcessorTest {
     @Test
     public void testUpdate() {
         testInsert();
+        testBegin_transaction();
 
         String sql = "update person set name = 'qiqi' where age=20";
         UpdateStatement statement = (UpdateStatement) sqlProcessor.parseSQL(sql).get(0);
@@ -213,6 +251,8 @@ public class MySQLProcessorTest {
         assert sqlResult.isSucceed();
         Table table = manger.getDatabase("test").getTable("person");
         assert table.hasKey(new Entry("'qiqi'"));
+
+        testCommit();
     }
 
     /*
@@ -222,6 +262,7 @@ public class MySQLProcessorTest {
     @Test
     public void testDelete() {
         testInsert();
+        testBegin_transaction();
 
         String sql = "delete from person where name='liqi'";
         DeleteStatement statement = (DeleteStatement) sqlProcessor.parseSQL(sql).get(0);
@@ -235,6 +276,8 @@ public class MySQLProcessorTest {
         SQLResult sqlResult = sqlProcessor.delete(statement, session);
         assert sqlResult.isSucceed();
         assert !table.hasKey(new Entry("'liqi'"));
+
+        testCommit();
     }
 
     /*
@@ -258,6 +301,8 @@ public class MySQLProcessorTest {
 
     @Test
     public void createSchema() {
+        testBegin_transaction();
+
         String sql = "CREATE TABLE person (name String(256) PRIMARY KEY, age Int not null); "
                    + "CREATE TABLE book (id int, name String(256), owner String(256) not null, primary key(id)); "
                    + "insert into person (name, age) values ('liqi', 20), ('guiacan', 21); "
@@ -280,6 +325,8 @@ public class MySQLProcessorTest {
         for (SQLResult sqlResult : sqlResults) {
             assert sqlResult.isSucceed();
         }
+
+        testCommit();
     }
 
     /*
@@ -310,6 +357,7 @@ public class MySQLProcessorTest {
     @Test
     public void testSelect() {
         createSchema();
+        testBegin_transaction();
 
         String sql = "select person.name, book.name from person join book on person.name=book.owner where person.name='liqi' && book.name='english';";
 //        String sql = "select age from person join book on person.name=book.owner;";
@@ -323,5 +371,7 @@ public class MySQLProcessorTest {
         assert sqlResult.getColumnList().get(1).equals("book.name");
         assert sqlResult.getRowList().get(0).get(0).equals("'liqi'");
         assert sqlResult.getRowList().get(0).get(1).equals("'english'");
+
+        testCommit();
     }
 }
