@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -193,11 +194,19 @@ public class SQLProcessor {
         try {
             QueryResult queryResult = manager.select(statement.getColumnNames(), statement.getTableQueries(), statement.getWhere(), statement.isDistinct(), session);
             List<String> columnNames = queryResult.getColumnNames();
-            List<Row> rows = queryResult.getResults();
+            Collection<Row> rows = queryResult.getResults();
 
             List<List<String>> stringRows = new ArrayList<>();
             for (Row row : rows) {
-                List<String> stringRow = row.getEntries().stream().map(Entry::toString).collect(Collectors.toList());
+                List<String> stringRow = new ArrayList<>();
+                for (Entry entry : row.getEntries()) {
+                    if (entry == null) {
+                        stringRow.add("null");
+                    } else {
+                        stringRow.add(entry.toString());
+                    }
+                }
+//                List<String> stringRow = row.getEntries().stream().map(Entry::toString).collect(Collectors.toList());
                 stringRows.add(stringRow);
             }
 

@@ -7,7 +7,6 @@ import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.server.Session;
 import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.type.ColumnType;
-import cn.edu.thssdb.type.ValueType;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -307,8 +306,10 @@ public class MySQLProcessorTest {
 
         String sql = "CREATE TABLE person (name String(256) PRIMARY KEY, age Int not null); "
                    + "CREATE TABLE book (id int, name String(256), owner String(256) not null, primary key(id)); "
-                   + "insert into person (name, age) values ('liqi', 20), ('guiacan', 21); "
-                   + "INSERT INTO book values (1, 'math', 'liqi'), (2, 'chinese', 'guiacan'), (3, 'english', 'liqi'), (4, 'english', 'guiacan')";
+                   + "CREATE TABLE live (name string(256) primary key, house string(256) not null);"
+                   + "insert into person (name, age) values ('liqi', 20), ('guiacan', 21), ('sb', 32); "
+                   + "insert into live (name, house) values ('liqi', 'datong'), ('guiacan', 'beijing'); "
+                   + "INSERT INTO book values (1, 'math', 'liqi'), (2, 'chinese', 'guiacan'), (3, 'english', 'liqi'), (4, 'english', 'guiacan'), (5, 'english', 'sa')";
 
         try {
             manger.getDatabase("test").drop("person");
@@ -318,6 +319,12 @@ public class MySQLProcessorTest {
 
         try {
             manger.getDatabase("test").drop("book");
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            manger.getDatabase("test").drop("live");
         } catch (Exception ignored) {
 
         }
@@ -361,7 +368,14 @@ public class MySQLProcessorTest {
         createSchema();
         testBegin_transaction();
 
+//        String sql = "select * from person, book, live where person.name=live.name && person.name=book.owner;";
+//        String sql = "select person.name, book.name from person, book where person.name=book.owner && person.name='liqi' && book.name='english';";
         String sql = "select person.name, book.name from person join book on person.name=book.owner where person.name='liqi' && book.name='english';";
+//        String sql = "select person.name, book.name from person left outer join book on person.name=book.owner;";
+//        String sql = "select person.name, book.name from person join book on person.name=book.owner where person.name='liqi' && book.name='english';";
+//        String sql = "select * from person join book on person.name=book.owner where person.name='liqi' && book.name='english';";
+//        String sql = "select person.name, book.name from person, book where person.name=book.owner where person.name='liqi' && book.name='english';";
+//        String sql = "select * from person, book where person.name=book.owner where person.name='liqi' && book.name='english';";
 //        String sql = "select age from person join book on person.name=book.owner;";
 //        String sql = "select name, age from person;";
 
@@ -373,6 +387,77 @@ public class MySQLProcessorTest {
         assert sqlResult.getColumnList().get(1).equals("book.name");
         assert sqlResult.getRowList().get(0).get(0).equals("'liqi'");
         assert sqlResult.getRowList().get(0).get(1).equals("'english'");
+
+        testCommit();
+    }
+
+    /*
+    select_stmt :
+        K_SELECT ( K_DISTINCT | K_ALL )? result_column ( ',' result_column )*
+            K_FROM table_query ( ',' table_query )* ( K_WHERE multiple_condition )? ;
+     */
+    @Test
+    public void testMultiSelect() {
+        createSchema();
+        testBegin_transaction();
+
+        String sql = "select * from person, book, live where person.name=live.name && person.name=book.owner;";
+        SelectStatement statement = (SelectStatement) sqlProcessor.parseSQL(sql).get(0);
+
+        SQLResult sqlResult = sqlProcessor.select(statement, session);
+        assert sqlResult.isSucceed();
+        assert sqlResult.getRowList().get(0).size() == 7;
+
+        testCommit();
+    }
+
+    /*
+    select_stmt :
+        K_SELECT ( K_DISTINCT | K_ALL )? result_column ( ',' result_column )*
+            K_FROM table_query ( ',' table_query )* ( K_WHERE multiple_condition )? ;
+     */
+    @Test
+    public void testSelectOuterJoin() {
+        createSchema();
+        testBegin_transaction();
+
+        String sql1 = "select person.name, book.name from person left outer join book on person.name=book.owner;";
+        SelectStatement statement1 = (SelectStatement) sqlProcessor.parseSQL(sql1).get(0);
+        SQLResult sqlResult1 = sqlProcessor.select(statement1, session);
+        assert sqlResult1.isSucceed();
+        assert sqlResult1.getRowList().get(sqlResult1.getRowList().size()-1).get(1).equals("null");
+
+        String sql2 = "select person.name, book.name from person right outer join book on person.name=book.owner;";
+        SelectStatement statement2 = (SelectStatement) sqlProcessor.parseSQL(sql2).get(0);
+        SQLResult sqlResult2 = sqlProcessor.select(statement2, session);
+        assert sqlResult2.isSucceed();
+        assert sqlResult2.getRowList().get(sqlResult2.getRowList().size()-1).get(0).equals("null");
+
+        String sql3 = "select person.name, book.name from person outer join book on person.name=book.owner;";
+        SelectStatement statement3 = (SelectStatement) sqlProcessor.parseSQL(sql3).get(0);
+        SQLResult sqlResult3 = sqlProcessor.select(statement3, session);
+        assert sqlResult3.isSucceed();
+        assert sqlResult3.getRowList().get(sqlResult3.getRowList().size()-2).get(1).equals("null");
+        assert sqlResult3.getRowList().get(sqlResult3.getRowList().size()-1).get(0).equals("null");
+
+        testCommit();
+    }
+
+    /*
+    select_stmt :
+        K_SELECT ( K_DISTINCT | K_ALL )? result_column ( ',' result_column )*
+            K_FROM table_query ( ',' table_query )* ( K_WHERE multiple_condition )? ;
+     */
+    @Test
+    public void testDistinctSelect() {
+        createSchema();
+        testBegin_transaction();
+
+        String sql = "select distinct person.name from person, book, live where person.name=live.name && person.name=book.owner;";
+        SelectStatement statement = (SelectStatement) sqlProcessor.parseSQL(sql).get(0);
+
+        SQLResult sqlResult = sqlProcessor.select(statement, session);
+        assert sqlResult.getRowList().size() == 2;
 
         testCommit();
     }

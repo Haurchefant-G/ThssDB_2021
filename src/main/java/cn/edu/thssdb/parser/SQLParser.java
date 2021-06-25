@@ -17,43 +17,44 @@ public class SQLParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, EQ=6, NE=7, LT=8, GT=9, LE=10, 
-		GE=11, ADD=12, SUB=13, MUL=14, DIV=15, AND=16, OR=17, T_INT=18, T_LONG=19, 
-		T_FLOAT=20, T_DOUBLE=21, T_STRING=22, K_ADD=23, K_ALL=24, K_AS=25, K_BY=26, 
-		K_COLUMN=27, K_CREATE=28, K_DATABASE=29, K_DATABASES=30, K_DELETE=31, 
-		K_DISTINCT=32, K_DROP=33, K_EXISTS=34, K_FROM=35, K_GRANT=36, K_IF=37, 
-		K_IDENTIFIED=38, K_INSERT=39, K_INTO=40, K_JOIN=41, K_KEY=42, K_NOT=43, 
-		K_NULL=44, K_ON=45, K_PRIMARY=46, K_QUIT=47, K_REVOKE=48, K_SELECT=49, 
-		K_SET=50, K_SHOW=51, K_TABLE=52, K_TABLES=53, K_TO=54, K_UPDATE=55, K_USE=56, 
-		K_USER=57, K_VALUES=58, K_VIEW=59, K_WHERE=60, K_BEGIN=61, K_TRANSACTION=62, 
-		K_COMMIT=63, IDENTIFIER=64, NUMERIC_LITERAL=65, EXPONENT=66, STRING_LITERAL=67, 
-		SINGLE_LINE_COMMENT=68, MULTILINE_COMMENT=69, SPACES=70;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, EQ=6, NE=7, LT=8, GT=9, LE=10,
+		GE=11, ADD=12, SUB=13, MUL=14, DIV=15, AND=16, OR=17, T_INT=18, T_LONG=19,
+		T_FLOAT=20, T_DOUBLE=21, T_STRING=22, K_ADD=23, K_ALL=24, K_AS=25, K_BY=26,
+		K_COLUMN=27, K_CREATE=28, K_DATABASE=29, K_DATABASES=30, K_DELETE=31,
+		K_DISTINCT=32, K_LEFT=33, K_RIGHT=34, K_OUTER=35, K_DROP=36, K_EXISTS=37,
+		K_FROM=38, K_GRANT=39, K_IF=40, K_IDENTIFIED=41, K_INSERT=42, K_INTO=43,
+		K_JOIN=44, K_KEY=45, K_NOT=46, K_NULL=47, K_ON=48, K_PRIMARY=49, K_QUIT=50,
+		K_REVOKE=51, K_SELECT=52, K_SET=53, K_SHOW=54, K_TABLE=55, K_TABLES=56,
+		K_TO=57, K_UPDATE=58, K_USE=59, K_USER=60, K_VALUES=61, K_VIEW=62, K_WHERE=63,
+		K_BEGIN=64, K_TRANSACTION=65, K_COMMIT=66, IDENTIFIER=67, NUMERIC_LITERAL=68,
+		EXPONENT=69, STRING_LITERAL=70, SINGLE_LINE_COMMENT=71, MULTILINE_COMMENT=72,
+		SPACES=73;
 	public static final int
-		RULE_parse = 0, RULE_sql_stmt_list = 1, RULE_sql_stmt = 2, RULE_create_db_stmt = 3, 
-		RULE_drop_db_stmt = 4, RULE_create_user_stmt = 5, RULE_drop_user_stmt = 6, 
-		RULE_create_table_stmt = 7, RULE_show_table_stmt = 8, RULE_grant_stmt = 9, 
-		RULE_revoke_stmt = 10, RULE_use_db_stmt = 11, RULE_delete_stmt = 12, RULE_drop_table_stmt = 13, 
-		RULE_show_db_stmt = 14, RULE_quit_stmt = 15, RULE_show_tables_stmt = 16, 
-		RULE_insert_stmt = 17, RULE_value_entry = 18, RULE_select_stmt = 19, RULE_create_view_stmt = 20, 
-		RULE_drop_view_stmt = 21, RULE_update_stmt = 22, RULE_begin_transaction_stmt = 23, 
-		RULE_commit_stmt = 24, RULE_column_def = 25, RULE_type_name = 26, RULE_column_constraint = 27, 
-		RULE_multiple_condition = 28, RULE_condition = 29, RULE_comparer = 30, 
-		RULE_comparator = 31, RULE_expression = 32, RULE_table_constraint = 33, 
-		RULE_result_column = 34, RULE_table_query = 35, RULE_auth_level = 36, 
-		RULE_literal_value = 37, RULE_column_full_name = 38, RULE_database_name = 39, 
-		RULE_table_name = 40, RULE_user_name = 41, RULE_column_name = 42, RULE_view_name = 43, 
+		RULE_parse = 0, RULE_sql_stmt_list = 1, RULE_sql_stmt = 2, RULE_create_db_stmt = 3,
+		RULE_drop_db_stmt = 4, RULE_create_user_stmt = 5, RULE_drop_user_stmt = 6,
+		RULE_create_table_stmt = 7, RULE_show_table_stmt = 8, RULE_grant_stmt = 9,
+		RULE_revoke_stmt = 10, RULE_use_db_stmt = 11, RULE_delete_stmt = 12, RULE_drop_table_stmt = 13,
+		RULE_show_db_stmt = 14, RULE_quit_stmt = 15, RULE_show_tables_stmt = 16,
+		RULE_insert_stmt = 17, RULE_value_entry = 18, RULE_select_stmt = 19, RULE_create_view_stmt = 20,
+		RULE_drop_view_stmt = 21, RULE_update_stmt = 22, RULE_begin_transaction_stmt = 23,
+		RULE_commit_stmt = 24, RULE_column_def = 25, RULE_type_name = 26, RULE_column_constraint = 27,
+		RULE_multiple_condition = 28, RULE_condition = 29, RULE_comparer = 30,
+		RULE_comparator = 31, RULE_expression = 32, RULE_table_constraint = 33,
+		RULE_result_column = 34, RULE_table_query = 35, RULE_auth_level = 36,
+		RULE_literal_value = 37, RULE_column_full_name = 38, RULE_database_name = 39,
+		RULE_table_name = 40, RULE_user_name = 41, RULE_column_name = 42, RULE_view_name = 43,
 		RULE_password = 44;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"parse", "sql_stmt_list", "sql_stmt", "create_db_stmt", "drop_db_stmt", 
-			"create_user_stmt", "drop_user_stmt", "create_table_stmt", "show_table_stmt", 
-			"grant_stmt", "revoke_stmt", "use_db_stmt", "delete_stmt", "drop_table_stmt", 
-			"show_db_stmt", "quit_stmt", "show_tables_stmt", "insert_stmt", "value_entry", 
-			"select_stmt", "create_view_stmt", "drop_view_stmt", "update_stmt", "begin_transaction_stmt", 
-			"commit_stmt", "column_def", "type_name", "column_constraint", "multiple_condition", 
-			"condition", "comparer", "comparator", "expression", "table_constraint", 
-			"result_column", "table_query", "auth_level", "literal_value", "column_full_name", 
-			"database_name", "table_name", "user_name", "column_name", "view_name", 
+			"parse", "sql_stmt_list", "sql_stmt", "create_db_stmt", "drop_db_stmt",
+			"create_user_stmt", "drop_user_stmt", "create_table_stmt", "show_table_stmt",
+			"grant_stmt", "revoke_stmt", "use_db_stmt", "delete_stmt", "drop_table_stmt",
+			"show_db_stmt", "quit_stmt", "show_tables_stmt", "insert_stmt", "value_entry",
+			"select_stmt", "create_view_stmt", "drop_view_stmt", "update_stmt", "begin_transaction_stmt",
+			"commit_stmt", "column_def", "type_name", "column_constraint", "multiple_condition",
+			"condition", "comparer", "comparator", "expression", "table_constraint",
+			"result_column", "table_query", "auth_level", "literal_value", "column_full_name",
+			"database_name", "table_name", "user_name", "column_name", "view_name",
 			"password"
 		};
 	}
@@ -61,24 +62,24 @@ public class SQLParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "';'", "'('", "','", "')'", "'.'", "'='", "'<>'", "'<'", "'>'", 
+			null, "';'", "'('", "','", "')'", "'.'", "'='", "'<>'", "'<'", "'>'",
 			"'<='", "'>='", "'+'", "'-'", "'*'", "'/'", "'&&'", "'||'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, "EQ", "NE", "LT", "GT", "LE", "GE", 
-			"ADD", "SUB", "MUL", "DIV", "AND", "OR", "T_INT", "T_LONG", "T_FLOAT", 
-			"T_DOUBLE", "T_STRING", "K_ADD", "K_ALL", "K_AS", "K_BY", "K_COLUMN", 
-			"K_CREATE", "K_DATABASE", "K_DATABASES", "K_DELETE", "K_DISTINCT", "K_DROP", 
-			"K_EXISTS", "K_FROM", "K_GRANT", "K_IF", "K_IDENTIFIED", "K_INSERT", 
-			"K_INTO", "K_JOIN", "K_KEY", "K_NOT", "K_NULL", "K_ON", "K_PRIMARY", 
-			"K_QUIT", "K_REVOKE", "K_SELECT", "K_SET", "K_SHOW", "K_TABLE", "K_TABLES", 
-			"K_TO", "K_UPDATE", "K_USE", "K_USER", "K_VALUES", "K_VIEW", "K_WHERE", 
-			"K_BEGIN", "K_TRANSACTION", "K_COMMIT", "IDENTIFIER", "NUMERIC_LITERAL", 
-			"EXPONENT", "STRING_LITERAL", "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT", 
-			"SPACES"
+			null, null, null, null, null, null, "EQ", "NE", "LT", "GT", "LE", "GE",
+			"ADD", "SUB", "MUL", "DIV", "AND", "OR", "T_INT", "T_LONG", "T_FLOAT",
+			"T_DOUBLE", "T_STRING", "K_ADD", "K_ALL", "K_AS", "K_BY", "K_COLUMN",
+			"K_CREATE", "K_DATABASE", "K_DATABASES", "K_DELETE", "K_DISTINCT", "K_LEFT",
+			"K_RIGHT", "K_OUTER", "K_DROP", "K_EXISTS", "K_FROM", "K_GRANT", "K_IF",
+			"K_IDENTIFIED", "K_INSERT", "K_INTO", "K_JOIN", "K_KEY", "K_NOT", "K_NULL",
+			"K_ON", "K_PRIMARY", "K_QUIT", "K_REVOKE", "K_SELECT", "K_SET", "K_SHOW",
+			"K_TABLE", "K_TABLES", "K_TO", "K_UPDATE", "K_USE", "K_USER", "K_VALUES",
+			"K_VIEW", "K_WHERE", "K_BEGIN", "K_TRANSACTION", "K_COMMIT", "IDENTIFIER",
+			"NUMERIC_LITERAL", "EXPONENT", "STRING_LITERAL", "SINGLE_LINE_COMMENT",
+			"MULTILINE_COMMENT", "SPACES"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -141,14 +142,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_parse; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterParse(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitParse(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitParse(this);
 			else return visitor.visitChildren(this);
@@ -188,14 +181,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_sql_stmt_list; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterSql_stmt_list(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitSql_stmt_list(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitSql_stmt_list(this);
 			else return visitor.visitChildren(this);
@@ -233,7 +218,7 @@ public class SQLParser extends Parser {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(100); 
+					setState(100);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					do {
@@ -243,14 +228,14 @@ public class SQLParser extends Parser {
 						match(T__0);
 						}
 						}
-						setState(102); 
+						setState(102);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					} while ( _la==T__0 );
 					setState(104);
 					sql_stmt();
 					}
-					} 
+					}
 				}
 				setState(109);
 				_errHandler.sync(this);
@@ -351,14 +336,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_sql_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterSql_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitSql_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitSql_stmt(this);
@@ -544,14 +521,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_create_db_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCreate_db_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCreate_db_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCreate_db_stmt(this);
 			else return visitor.visitChildren(this);
@@ -595,14 +564,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_drop_db_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDrop_db_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDrop_db_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDrop_db_stmt(this);
@@ -664,14 +625,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_create_user_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCreate_user_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCreate_user_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCreate_user_stmt(this);
 			else return visitor.visitChildren(this);
@@ -721,14 +674,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_drop_user_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDrop_user_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDrop_user_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDrop_user_stmt(this);
@@ -794,14 +739,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_create_table_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCreate_table_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCreate_table_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCreate_table_stmt(this);
 			else return visitor.visitChildren(this);
@@ -838,7 +775,7 @@ public class SQLParser extends Parser {
 					setState(172);
 					column_def();
 					}
-					} 
+					}
 				}
 				setState(177);
 				_errHandler.sync(this);
@@ -881,14 +818,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_show_table_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterShow_table_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitShow_table_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitShow_table_stmt(this);
@@ -941,14 +870,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_grant_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterGrant_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitGrant_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitGrant_stmt(this);
@@ -1025,14 +946,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_revoke_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterRevoke_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitRevoke_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitRevoke_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1097,14 +1010,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_use_db_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterUse_db_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitUse_db_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitUse_db_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1148,14 +1053,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_delete_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDelete_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDelete_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDelete_stmt(this);
@@ -1214,14 +1111,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_drop_table_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDrop_table_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDrop_table_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDrop_table_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1274,14 +1163,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_show_db_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterShow_db_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitShow_db_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitShow_db_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1318,14 +1199,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_quit_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterQuit_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitQuit_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitQuit_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1360,14 +1233,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_show_tables_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterShow_tables_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitShow_tables_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitShow_tables_stmt(this);
@@ -1421,14 +1286,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_insert_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterInsert_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitInsert_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitInsert_stmt(this);
@@ -1524,14 +1381,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_value_entry; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterValue_entry(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitValue_entry(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitValue_entry(this);
 			else return visitor.visitChildren(this);
@@ -1605,14 +1454,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_select_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterSelect_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitSelect_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitSelect_stmt(this);
@@ -1725,14 +1566,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_create_view_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCreate_view_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCreate_view_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCreate_view_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1780,14 +1613,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_drop_view_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDrop_view_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDrop_view_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDrop_view_stmt(this);
@@ -1855,14 +1680,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_update_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterUpdate_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitUpdate_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitUpdate_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1921,14 +1738,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_begin_transaction_stmt; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterBegin_transaction_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitBegin_transaction_stmt(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitBegin_transaction_stmt(this);
 			else return visitor.visitChildren(this);
@@ -1964,14 +1773,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_commit_stmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCommit_stmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCommit_stmt(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCommit_stmt(this);
@@ -2017,14 +1818,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_column_def; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterColumn_def(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitColumn_def(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitColumn_def(this);
@@ -2081,14 +1874,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type_name; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterType_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitType_name(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitType_name(this);
@@ -2169,14 +1954,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_column_constraint; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterColumn_constraint(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitColumn_constraint(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitColumn_constraint(this);
 			else return visitor.visitChildren(this);
@@ -2239,14 +2016,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_multiple_condition; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterMultiple_condition(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitMultiple_condition(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitMultiple_condition(this);
@@ -2326,7 +2095,7 @@ public class SQLParser extends Parser {
 						}
 						break;
 					}
-					} 
+					}
 				}
 				setState(374);
 				_errHandler.sync(this);
@@ -2359,14 +2128,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_condition; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterCondition(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitCondition(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitCondition(this);
@@ -2410,14 +2171,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_comparer; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterComparer(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitComparer(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitComparer(this);
@@ -2475,14 +2228,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_comparator; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterComparator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitComparator(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitComparator(this);
 			else return visitor.visitChildren(this);
@@ -2537,14 +2282,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitExpression(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitExpression(this);
@@ -2646,7 +2383,7 @@ public class SQLParser extends Parser {
 						}
 						break;
 					}
-					} 
+					}
 				}
 				setState(403);
 				_errHandler.sync(this);
@@ -2678,14 +2415,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_table_constraint; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterTable_constraint(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitTable_constraint(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitTable_constraint(this);
@@ -2751,14 +2480,6 @@ public class SQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_result_column; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterResult_column(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitResult_column(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitResult_column(this);
@@ -2826,18 +2547,22 @@ public class SQLParser extends Parser {
 		public TerminalNode K_JOIN(int i) {
 			return getToken(SQLParser.K_JOIN, i);
 		}
+		public List<TerminalNode> K_OUTER() { return getTokens(SQLParser.K_OUTER); }
+		public TerminalNode K_OUTER(int i) {
+			return getToken(SQLParser.K_OUTER, i);
+		}
+		public List<TerminalNode> K_LEFT() { return getTokens(SQLParser.K_LEFT); }
+		public TerminalNode K_LEFT(int i) {
+			return getToken(SQLParser.K_LEFT, i);
+		}
+		public List<TerminalNode> K_RIGHT() { return getTokens(SQLParser.K_RIGHT); }
+		public TerminalNode K_RIGHT(int i) {
+			return getToken(SQLParser.K_RIGHT, i);
+		}
 		public Table_queryContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_table_query; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterTable_query(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitTable_query(this);
-		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitTable_query(this);
@@ -2850,9 +2575,9 @@ public class SQLParser extends Parser {
 		enterRule(_localctx, 70, RULE_table_query);
 		int _la;
 		try {
-			setState(436);
+			setState(442);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,36,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,38,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
@@ -2865,25 +2590,53 @@ public class SQLParser extends Parser {
 				{
 				setState(426);
 				table_name();
-				setState(429); 
+				setState(435);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(427);
+					setState(431);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << K_LEFT) | (1L << K_RIGHT) | (1L << K_OUTER))) != 0)) {
+						{
+						setState(428);
+						_errHandler.sync(this);
+						_la = _input.LA(1);
+						if (_la==K_LEFT || _la==K_RIGHT) {
+							{
+							setState(427);
+							_la = _input.LA(1);
+							if ( !(_la==K_LEFT || _la==K_RIGHT) ) {
+							_errHandler.recoverInline(this);
+							}
+							else {
+								if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+								_errHandler.reportMatch(this);
+								consume();
+							}
+							}
+						}
+
+						setState(430);
+						match(K_OUTER);
+						}
+					}
+
+					setState(433);
 					match(K_JOIN);
-					setState(428);
+					setState(434);
 					table_name();
 					}
 					}
-					setState(431); 
+					setState(437);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-				} while ( _la==K_JOIN );
-				setState(433);
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << K_LEFT) | (1L << K_RIGHT) | (1L << K_OUTER) | (1L << K_JOIN))) != 0) );
+				setState(439);
 				match(K_ON);
-				setState(434);
+				setState(440);
 				multiple_condition(0);
 				}
 				break;
@@ -2911,14 +2664,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_auth_level; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterAuth_level(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitAuth_level(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitAuth_level(this);
 			else return visitor.visitChildren(this);
@@ -2932,7 +2677,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(438);
+			setState(444);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << K_DELETE) | (1L << K_DROP) | (1L << K_INSERT) | (1L << K_SELECT) | (1L << K_UPDATE))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -2964,14 +2709,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_literal_value; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterLiteral_value(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitLiteral_value(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitLiteral_value(this);
 			else return visitor.visitChildren(this);
@@ -2985,9 +2722,9 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(440);
+			setState(446);
 			_la = _input.LA(1);
-			if ( !(((((_la - 44)) & ~0x3f) == 0 && ((1L << (_la - 44)) & ((1L << (K_NULL - 44)) | (1L << (NUMERIC_LITERAL - 44)) | (1L << (STRING_LITERAL - 44)))) != 0)) ) {
+			if ( !(((((_la - 47)) & ~0x3f) == 0 && ((1L << (_la - 47)) & ((1L << (K_NULL - 47)) | (1L << (NUMERIC_LITERAL - 47)) | (1L << (STRING_LITERAL - 47)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -3020,14 +2757,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_column_full_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterColumn_full_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitColumn_full_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitColumn_full_name(this);
 			else return visitor.visitChildren(this);
@@ -3040,19 +2769,19 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(445);
+			setState(451);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,37,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,39,_ctx) ) {
 			case 1:
 				{
-				setState(442);
+				setState(448);
 				table_name();
-				setState(443);
+				setState(449);
 				match(T__4);
 				}
 				break;
 			}
-			setState(447);
+			setState(453);
 			column_name();
 			}
 		}
@@ -3074,14 +2803,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_database_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterDatabase_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitDatabase_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitDatabase_name(this);
 			else return visitor.visitChildren(this);
@@ -3094,7 +2815,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(449);
+			setState(455);
 			match(IDENTIFIER);
 			}
 		}
@@ -3116,14 +2837,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_table_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterTable_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitTable_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitTable_name(this);
 			else return visitor.visitChildren(this);
@@ -3136,7 +2849,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(451);
+			setState(457);
 			match(IDENTIFIER);
 			}
 		}
@@ -3158,14 +2871,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_user_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterUser_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitUser_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitUser_name(this);
 			else return visitor.visitChildren(this);
@@ -3178,7 +2883,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(453);
+			setState(459);
 			match(IDENTIFIER);
 			}
 		}
@@ -3200,14 +2905,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_column_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterColumn_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitColumn_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitColumn_name(this);
 			else return visitor.visitChildren(this);
@@ -3220,7 +2917,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(455);
+			setState(461);
 			match(IDENTIFIER);
 			}
 		}
@@ -3242,14 +2939,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_view_name; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterView_name(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitView_name(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitView_name(this);
 			else return visitor.visitChildren(this);
@@ -3262,7 +2951,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(457);
+			setState(463);
 			match(IDENTIFIER);
 			}
 		}
@@ -3284,14 +2973,6 @@ public class SQLParser extends Parser {
 		}
 		@Override public int getRuleIndex() { return RULE_password; }
 		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).enterPassword(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SQLListener ) ((SQLListener)listener).exitPassword(this);
-		}
-		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SQLVisitor ) return ((SQLVisitor<? extends T>)visitor).visitPassword(this);
 			else return visitor.visitChildren(this);
@@ -3304,7 +2985,7 @@ public class SQLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(459);
+			setState(465);
 			match(STRING_LITERAL);
 			}
 		}
@@ -3348,7 +3029,7 @@ public class SQLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3H\u01d0\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3K\u01d6\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -3379,137 +3060,140 @@ public class SQLParser extends Parser {
 		"\f\36\16\36\u0178\13\36\3\37\3\37\3\37\3\37\3 \3 \5 \u0180\n \3!\3!\3"+
 		"\"\3\"\3\"\3\"\3\"\3\"\5\"\u018a\n\"\3\"\3\"\3\"\3\"\3\"\3\"\7\"\u0192"+
 		"\n\"\f\"\16\"\u0195\13\"\3#\3#\3#\3#\3#\3#\7#\u019d\n#\f#\16#\u01a0\13"+
-		"#\3#\3#\3$\3$\3$\3$\3$\3$\5$\u01aa\n$\3%\3%\3%\3%\6%\u01b0\n%\r%\16%\u01b1"+
-		"\3%\3%\3%\5%\u01b7\n%\3&\3&\3\'\3\'\3(\3(\3(\5(\u01c0\n(\3(\3(\3)\3)\3"+
-		"*\3*\3+\3+\3,\3,\3-\3-\3.\3.\3.\2\4:B/\2\4\6\b\n\f\16\20\22\24\26\30\32"+
-		"\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\2\b\4\2\32\32\"\"\3\2\b"+
-		"\r\3\2\20\21\3\2\16\17\7\2!!##))\63\6399\5\2..CCEE\2\u01df\2\\\3\2\2\2"+
-		"\4a\3\2\2\2\6\u008b\3\2\2\2\b\u008d\3\2\2\2\n\u0091\3\2\2\2\f\u0099\3"+
-		"\2\2\2\16\u00a0\3\2\2\2\20\u00a8\3\2\2\2\22\u00ba\3\2\2\2\24\u00be\3\2"+
-		"\2\2\26\u00cc\3\2\2\2\30\u00da\3\2\2\2\32\u00dd\3\2\2\2\34\u00e4\3\2\2"+
-		"\2\36\u00ec\3\2\2\2 \u00ef\3\2\2\2\"\u00f1\3\2\2\2$\u00f4\3\2\2\2&\u010d"+
-		"\3\2\2\2(\u0118\3\2\2\2*\u0131\3\2\2\2,\u0137\3\2\2\2.\u013f\3\2\2\2\60"+
-		"\u0149\3\2\2\2\62\u014c\3\2\2\2\64\u014e\3\2\2\2\66\u015e\3\2\2\28\u0164"+
-		"\3\2\2\2:\u016c\3\2\2\2<\u0179\3\2\2\2>\u017f\3\2\2\2@\u0181\3\2\2\2B"+
-		"\u0189\3\2\2\2D\u0196\3\2\2\2F\u01a9\3\2\2\2H\u01b6\3\2\2\2J\u01b8\3\2"+
-		"\2\2L\u01ba\3\2\2\2N\u01bf\3\2\2\2P\u01c3\3\2\2\2R\u01c5\3\2\2\2T\u01c7"+
-		"\3\2\2\2V\u01c9\3\2\2\2X\u01cb\3\2\2\2Z\u01cd\3\2\2\2\\]\5\4\3\2]\3\3"+
-		"\2\2\2^`\7\3\2\2_^\3\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3\2\2\2bd\3\2\2\2ca\3"+
-		"\2\2\2dm\5\6\4\2eg\7\3\2\2fe\3\2\2\2gh\3\2\2\2hf\3\2\2\2hi\3\2\2\2ij\3"+
-		"\2\2\2jl\5\6\4\2kf\3\2\2\2lo\3\2\2\2mk\3\2\2\2mn\3\2\2\2ns\3\2\2\2om\3"+
-		"\2\2\2pr\7\3\2\2qp\3\2\2\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2t\5\3\2\2\2us"+
-		"\3\2\2\2v\u008c\5\20\t\2w\u008c\5\b\5\2x\u008c\5\f\7\2y\u008c\5\n\6\2"+
-		"z\u008c\5\16\b\2{\u008c\5\32\16\2|\u008c\5\34\17\2}\u008c\5$\23\2~\u008c"+
-		"\5(\25\2\177\u008c\5*\26\2\u0080\u008c\5,\27\2\u0081\u008c\5\24\13\2\u0082"+
-		"\u008c\5\26\f\2\u0083\u008c\5\30\r\2\u0084\u008c\5\36\20\2\u0085\u008c"+
-		"\5\"\22\2\u0086\u008c\5\22\n\2\u0087\u008c\5 \21\2\u0088\u008c\5.\30\2"+
-		"\u0089\u008c\5\60\31\2\u008a\u008c\5\62\32\2\u008bv\3\2\2\2\u008bw\3\2"+
-		"\2\2\u008bx\3\2\2\2\u008by\3\2\2\2\u008bz\3\2\2\2\u008b{\3\2\2\2\u008b"+
-		"|\3\2\2\2\u008b}\3\2\2\2\u008b~\3\2\2\2\u008b\177\3\2\2\2\u008b\u0080"+
-		"\3\2\2\2\u008b\u0081\3\2\2\2\u008b\u0082\3\2\2\2\u008b\u0083\3\2\2\2\u008b"+
-		"\u0084\3\2\2\2\u008b\u0085\3\2\2\2\u008b\u0086\3\2\2\2\u008b\u0087\3\2"+
-		"\2\2\u008b\u0088\3\2\2\2\u008b\u0089\3\2\2\2\u008b\u008a\3\2\2\2\u008c"+
-		"\7\3\2\2\2\u008d\u008e\7\36\2\2\u008e\u008f\7\37\2\2\u008f\u0090\5P)\2"+
-		"\u0090\t\3\2\2\2\u0091\u0092\7#\2\2\u0092\u0095\7\37\2\2\u0093\u0094\7"+
-		"\'\2\2\u0094\u0096\7$\2\2\u0095\u0093\3\2\2\2\u0095\u0096\3\2\2\2\u0096"+
-		"\u0097\3\2\2\2\u0097\u0098\5P)\2\u0098\13\3\2\2\2\u0099\u009a\7\36\2\2"+
-		"\u009a\u009b\7;\2\2\u009b\u009c\5T+\2\u009c\u009d\7(\2\2\u009d\u009e\7"+
-		"\34\2\2\u009e\u009f\5Z.\2\u009f\r\3\2\2\2\u00a0\u00a1\7#\2\2\u00a1\u00a4"+
-		"\7;\2\2\u00a2\u00a3\7\'\2\2\u00a3\u00a5\7$\2\2\u00a4\u00a2\3\2\2\2\u00a4"+
-		"\u00a5\3\2\2\2\u00a5\u00a6\3\2\2\2\u00a6\u00a7\5T+\2\u00a7\17\3\2\2\2"+
-		"\u00a8\u00a9\7\36\2\2\u00a9\u00aa\7\66\2\2\u00aa\u00ab\5R*\2\u00ab\u00ac"+
-		"\7\4\2\2\u00ac\u00b1\5\64\33\2\u00ad\u00ae\7\5\2\2\u00ae\u00b0\5\64\33"+
-		"\2\u00af\u00ad\3\2\2\2\u00b0\u00b3\3\2\2\2\u00b1\u00af\3\2\2\2\u00b1\u00b2"+
-		"\3\2\2\2\u00b2\u00b6\3\2\2\2\u00b3\u00b1\3\2\2\2\u00b4\u00b5\7\5\2\2\u00b5"+
-		"\u00b7\5D#\2\u00b6\u00b4\3\2\2\2\u00b6\u00b7\3\2\2\2\u00b7\u00b8\3\2\2"+
-		"\2\u00b8\u00b9\7\6\2\2\u00b9\21\3\2\2\2\u00ba\u00bb\7\65\2\2\u00bb\u00bc"+
-		"\7\66\2\2\u00bc\u00bd\5R*\2\u00bd\23\3\2\2\2\u00be\u00bf\7&\2\2\u00bf"+
-		"\u00c4\5J&\2\u00c0\u00c1\7\5\2\2\u00c1\u00c3\5J&\2\u00c2\u00c0\3\2\2\2"+
-		"\u00c3\u00c6\3\2\2\2\u00c4\u00c2\3\2\2\2\u00c4\u00c5\3\2\2\2\u00c5\u00c7"+
-		"\3\2\2\2\u00c6\u00c4\3\2\2\2\u00c7\u00c8\7/\2\2\u00c8\u00c9\5R*\2\u00c9"+
-		"\u00ca\78\2\2\u00ca\u00cb\5T+\2\u00cb\25\3\2\2\2\u00cc\u00cd\7\62\2\2"+
-		"\u00cd\u00d2\5J&\2\u00ce\u00cf\7\5\2\2\u00cf\u00d1\5J&\2\u00d0\u00ce\3"+
-		"\2\2\2\u00d1\u00d4\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3"+
-		"\u00d5\3\2\2\2\u00d4\u00d2\3\2\2\2\u00d5\u00d6\7/\2\2\u00d6\u00d7\5R*"+
-		"\2\u00d7\u00d8\7%\2\2\u00d8\u00d9\5T+\2\u00d9\27\3\2\2\2\u00da\u00db\7"+
-		":\2\2\u00db\u00dc\5P)\2\u00dc\31\3\2\2\2\u00dd\u00de\7!\2\2\u00de\u00df"+
-		"\7%\2\2\u00df\u00e2\5R*\2\u00e0\u00e1\7>\2\2\u00e1\u00e3\5:\36\2\u00e2"+
-		"\u00e0\3\2\2\2\u00e2\u00e3\3\2\2\2\u00e3\33\3\2\2\2\u00e4\u00e5\7#\2\2"+
-		"\u00e5\u00e8\7\66\2\2\u00e6\u00e7\7\'\2\2\u00e7\u00e9\7$\2\2\u00e8\u00e6"+
-		"\3\2\2\2\u00e8\u00e9\3\2\2\2\u00e9\u00ea\3\2\2\2\u00ea\u00eb\5R*\2\u00eb"+
-		"\35\3\2\2\2\u00ec\u00ed\7\65\2\2\u00ed\u00ee\7 \2\2\u00ee\37\3\2\2\2\u00ef"+
-		"\u00f0\7\61\2\2\u00f0!\3\2\2\2\u00f1\u00f2\7\65\2\2\u00f2\u00f3\7\67\2"+
-		"\2\u00f3#\3\2\2\2\u00f4\u00f5\7)\2\2\u00f5\u00f6\7*\2\2\u00f6\u0102\5"+
-		"R*\2\u00f7\u00f8\7\4\2\2\u00f8\u00fd\5V,\2\u00f9\u00fa\7\5\2\2\u00fa\u00fc"+
-		"\5V,\2\u00fb\u00f9\3\2\2\2\u00fc\u00ff\3\2\2\2\u00fd\u00fb\3\2\2\2\u00fd"+
-		"\u00fe\3\2\2\2\u00fe\u0100\3\2\2\2\u00ff\u00fd\3\2\2\2\u0100\u0101\7\6"+
-		"\2\2\u0101\u0103\3\2\2\2\u0102\u00f7\3\2\2\2\u0102\u0103\3\2\2\2\u0103"+
-		"\u0104\3\2\2\2\u0104\u0105\7<\2\2\u0105\u010a\5&\24\2\u0106\u0107\7\5"+
-		"\2\2\u0107\u0109\5&\24\2\u0108\u0106\3\2\2\2\u0109\u010c\3\2\2\2\u010a"+
-		"\u0108\3\2\2\2\u010a\u010b\3\2\2\2\u010b%\3\2\2\2\u010c\u010a\3\2\2\2"+
-		"\u010d\u010e\7\4\2\2\u010e\u0113\5L\'\2\u010f\u0110\7\5\2\2\u0110\u0112"+
-		"\5L\'\2\u0111\u010f\3\2\2\2\u0112\u0115\3\2\2\2\u0113\u0111\3\2\2\2\u0113"+
-		"\u0114\3\2\2\2\u0114\u0116\3\2\2\2\u0115\u0113\3\2\2\2\u0116\u0117\7\6"+
-		"\2\2\u0117\'\3\2\2\2\u0118\u011a\7\63\2\2\u0119\u011b\t\2\2\2\u011a\u0119"+
-		"\3\2\2\2\u011a\u011b\3\2\2\2\u011b\u011c\3\2\2\2\u011c\u0121\5F$\2\u011d"+
-		"\u011e\7\5\2\2\u011e\u0120\5F$\2\u011f\u011d\3\2\2\2\u0120\u0123\3\2\2"+
-		"\2\u0121\u011f\3\2\2\2\u0121\u0122\3\2\2\2\u0122\u0124\3\2\2\2\u0123\u0121"+
-		"\3\2\2\2\u0124\u0125\7%\2\2\u0125\u012a\5H%\2\u0126\u0127\7\5\2\2\u0127"+
-		"\u0129\5H%\2\u0128\u0126\3\2\2\2\u0129\u012c\3\2\2\2\u012a\u0128\3\2\2"+
-		"\2\u012a\u012b\3\2\2\2\u012b\u012f\3\2\2\2\u012c\u012a\3\2\2\2\u012d\u012e"+
-		"\7>\2\2\u012e\u0130\5:\36\2\u012f\u012d\3\2\2\2\u012f\u0130\3\2\2\2\u0130"+
-		")\3\2\2\2\u0131\u0132\7\36\2\2\u0132\u0133\7=\2\2\u0133\u0134\5X-\2\u0134"+
-		"\u0135\7\33\2\2\u0135\u0136\5(\25\2\u0136+\3\2\2\2\u0137\u0138\7#\2\2"+
-		"\u0138\u013b\7=\2\2\u0139\u013a\7\'\2\2\u013a\u013c\7$\2\2\u013b\u0139"+
-		"\3\2\2\2\u013b\u013c\3\2\2\2\u013c\u013d\3\2\2\2\u013d\u013e\5X-\2\u013e"+
-		"-\3\2\2\2\u013f\u0140\79\2\2\u0140\u0141\5R*\2\u0141\u0142\7\64\2\2\u0142"+
-		"\u0143\5V,\2\u0143\u0144\7\b\2\2\u0144\u0147\5B\"\2\u0145\u0146\7>\2\2"+
-		"\u0146\u0148\5:\36\2\u0147\u0145\3\2\2\2\u0147\u0148\3\2\2\2\u0148/\3"+
-		"\2\2\2\u0149\u014a\7?\2\2\u014a\u014b\7@\2\2\u014b\61\3\2\2\2\u014c\u014d"+
-		"\7A\2\2\u014d\63\3\2\2\2\u014e\u014f\5V,\2\u014f\u0153\5\66\34\2\u0150"+
-		"\u0152\58\35\2\u0151\u0150\3\2\2\2\u0152\u0155\3\2\2\2\u0153\u0151\3\2"+
-		"\2\2\u0153\u0154\3\2\2\2\u0154\65\3\2\2\2\u0155\u0153\3\2\2\2\u0156\u015f"+
-		"\7\24\2\2\u0157\u015f\7\25\2\2\u0158\u015f\7\26\2\2\u0159\u015f\7\27\2"+
-		"\2\u015a\u015b\7\30\2\2\u015b\u015c\7\4\2\2\u015c\u015d\7C\2\2\u015d\u015f"+
-		"\7\6\2\2\u015e\u0156\3\2\2\2\u015e\u0157\3\2\2\2\u015e\u0158\3\2\2\2\u015e"+
-		"\u0159\3\2\2\2\u015e\u015a\3\2\2\2\u015f\67\3\2\2\2\u0160\u0161\7\60\2"+
-		"\2\u0161\u0165\7,\2\2\u0162\u0163\7-\2\2\u0163\u0165\7.\2\2\u0164\u0160"+
-		"\3\2\2\2\u0164\u0162\3\2\2\2\u01659\3\2\2\2\u0166\u0167\b\36\1\2\u0167"+
-		"\u0168\7\4\2\2\u0168\u0169\5:\36\2\u0169\u016a\7\6\2\2\u016a\u016d\3\2"+
-		"\2\2\u016b\u016d\5<\37\2\u016c\u0166\3\2\2\2\u016c\u016b\3\2\2\2\u016d"+
-		"\u0176\3\2\2\2\u016e\u016f\f\5\2\2\u016f\u0170\7\22\2\2\u0170\u0175\5"+
-		":\36\6\u0171\u0172\f\4\2\2\u0172\u0173\7\23\2\2\u0173\u0175\5:\36\5\u0174"+
-		"\u016e\3\2\2\2\u0174\u0171\3\2\2\2\u0175\u0178\3\2\2\2\u0176\u0174\3\2"+
-		"\2\2\u0176\u0177\3\2\2\2\u0177;\3\2\2\2\u0178\u0176\3\2\2\2\u0179\u017a"+
-		"\5B\"\2\u017a\u017b\5@!\2\u017b\u017c\5B\"\2\u017c=\3\2\2\2\u017d\u0180"+
-		"\5N(\2\u017e\u0180\5L\'\2\u017f\u017d\3\2\2\2\u017f\u017e\3\2\2\2\u0180"+
-		"?\3\2\2\2\u0181\u0182\t\3\2\2\u0182A\3\2\2\2\u0183\u0184\b\"\1\2\u0184"+
-		"\u018a\5> \2\u0185\u0186\7\4\2\2\u0186\u0187\5B\"\2\u0187\u0188\7\6\2"+
-		"\2\u0188\u018a\3\2\2\2\u0189\u0183\3\2\2\2\u0189\u0185\3\2\2\2\u018a\u0193"+
-		"\3\2\2\2\u018b\u018c\f\5\2\2\u018c\u018d\t\4\2\2\u018d\u0192\5B\"\6\u018e"+
-		"\u018f\f\4\2\2\u018f\u0190\t\5\2\2\u0190\u0192\5B\"\5\u0191\u018b\3\2"+
-		"\2\2\u0191\u018e\3\2\2\2\u0192\u0195\3\2\2\2\u0193\u0191\3\2\2\2\u0193"+
-		"\u0194\3\2\2\2\u0194C\3\2\2\2\u0195\u0193\3\2\2\2\u0196\u0197\7\60\2\2"+
-		"\u0197\u0198\7,\2\2\u0198\u0199\7\4\2\2\u0199\u019e\5V,\2\u019a\u019b"+
-		"\7\5\2\2\u019b\u019d\5V,\2\u019c\u019a\3\2\2\2\u019d\u01a0\3\2\2\2\u019e"+
-		"\u019c\3\2\2\2\u019e\u019f\3\2\2\2\u019f\u01a1\3\2\2\2\u01a0\u019e\3\2"+
-		"\2\2\u01a1\u01a2\7\6\2\2\u01a2E\3\2\2\2\u01a3\u01aa\7\20\2\2\u01a4\u01a5"+
-		"\5R*\2\u01a5\u01a6\7\7\2\2\u01a6\u01a7\7\20\2\2\u01a7\u01aa\3\2\2\2\u01a8"+
-		"\u01aa\5N(\2\u01a9\u01a3\3\2\2\2\u01a9\u01a4\3\2\2\2\u01a9\u01a8\3\2\2"+
-		"\2\u01aaG\3\2\2\2\u01ab\u01b7\5R*\2\u01ac\u01af\5R*\2\u01ad\u01ae\7+\2"+
-		"\2\u01ae\u01b0\5R*\2\u01af\u01ad\3\2\2\2\u01b0\u01b1\3\2\2\2\u01b1\u01af"+
-		"\3\2\2\2\u01b1\u01b2\3\2\2\2\u01b2\u01b3\3\2\2\2\u01b3\u01b4\7/\2\2\u01b4"+
-		"\u01b5\5:\36\2\u01b5\u01b7\3\2\2\2\u01b6\u01ab\3\2\2\2\u01b6\u01ac\3\2"+
-		"\2\2\u01b7I\3\2\2\2\u01b8\u01b9\t\6\2\2\u01b9K\3\2\2\2\u01ba\u01bb\t\7"+
-		"\2\2\u01bbM\3\2\2\2\u01bc\u01bd\5R*\2\u01bd\u01be\7\7\2\2\u01be\u01c0"+
-		"\3\2\2\2\u01bf\u01bc\3\2\2\2\u01bf\u01c0\3\2\2\2\u01c0\u01c1\3\2\2\2\u01c1"+
-		"\u01c2\5V,\2\u01c2O\3\2\2\2\u01c3\u01c4\7B\2\2\u01c4Q\3\2\2\2\u01c5\u01c6"+
-		"\7B\2\2\u01c6S\3\2\2\2\u01c7\u01c8\7B\2\2\u01c8U\3\2\2\2\u01c9\u01ca\7"+
-		"B\2\2\u01caW\3\2\2\2\u01cb\u01cc\7B\2\2\u01ccY\3\2\2\2\u01cd\u01ce\7E"+
-		"\2\2\u01ce[\3\2\2\2(ahms\u008b\u0095\u00a4\u00b1\u00b6\u00c4\u00d2\u00e2"+
+		"#\3#\3#\3$\3$\3$\3$\3$\3$\5$\u01aa\n$\3%\3%\3%\5%\u01af\n%\3%\5%\u01b2"+
+		"\n%\3%\3%\6%\u01b6\n%\r%\16%\u01b7\3%\3%\3%\5%\u01bd\n%\3&\3&\3\'\3\'"+
+		"\3(\3(\3(\5(\u01c6\n(\3(\3(\3)\3)\3*\3*\3+\3+\3,\3,\3-\3-\3.\3.\3.\2\4"+
+		":B/\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@B"+
+		"DFHJLNPRTVXZ\2\t\4\2\32\32\"\"\3\2\b\r\3\2\20\21\3\2\16\17\3\2#$\7\2!"+
+		"!&&,,\66\66<<\5\2\61\61FFHH\2\u01e7\2\\\3\2\2\2\4a\3\2\2\2\6\u008b\3\2"+
+		"\2\2\b\u008d\3\2\2\2\n\u0091\3\2\2\2\f\u0099\3\2\2\2\16\u00a0\3\2\2\2"+
+		"\20\u00a8\3\2\2\2\22\u00ba\3\2\2\2\24\u00be\3\2\2\2\26\u00cc\3\2\2\2\30"+
+		"\u00da\3\2\2\2\32\u00dd\3\2\2\2\34\u00e4\3\2\2\2\36\u00ec\3\2\2\2 \u00ef"+
+		"\3\2\2\2\"\u00f1\3\2\2\2$\u00f4\3\2\2\2&\u010d\3\2\2\2(\u0118\3\2\2\2"+
+		"*\u0131\3\2\2\2,\u0137\3\2\2\2.\u013f\3\2\2\2\60\u0149\3\2\2\2\62\u014c"+
+		"\3\2\2\2\64\u014e\3\2\2\2\66\u015e\3\2\2\28\u0164\3\2\2\2:\u016c\3\2\2"+
+		"\2<\u0179\3\2\2\2>\u017f\3\2\2\2@\u0181\3\2\2\2B\u0189\3\2\2\2D\u0196"+
+		"\3\2\2\2F\u01a9\3\2\2\2H\u01bc\3\2\2\2J\u01be\3\2\2\2L\u01c0\3\2\2\2N"+
+		"\u01c5\3\2\2\2P\u01c9\3\2\2\2R\u01cb\3\2\2\2T\u01cd\3\2\2\2V\u01cf\3\2"+
+		"\2\2X\u01d1\3\2\2\2Z\u01d3\3\2\2\2\\]\5\4\3\2]\3\3\2\2\2^`\7\3\2\2_^\3"+
+		"\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3\2\2\2bd\3\2\2\2ca\3\2\2\2dm\5\6\4\2eg\7"+
+		"\3\2\2fe\3\2\2\2gh\3\2\2\2hf\3\2\2\2hi\3\2\2\2ij\3\2\2\2jl\5\6\4\2kf\3"+
+		"\2\2\2lo\3\2\2\2mk\3\2\2\2mn\3\2\2\2ns\3\2\2\2om\3\2\2\2pr\7\3\2\2qp\3"+
+		"\2\2\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2t\5\3\2\2\2us\3\2\2\2v\u008c\5\20"+
+		"\t\2w\u008c\5\b\5\2x\u008c\5\f\7\2y\u008c\5\n\6\2z\u008c\5\16\b\2{\u008c"+
+		"\5\32\16\2|\u008c\5\34\17\2}\u008c\5$\23\2~\u008c\5(\25\2\177\u008c\5"+
+		"*\26\2\u0080\u008c\5,\27\2\u0081\u008c\5\24\13\2\u0082\u008c\5\26\f\2"+
+		"\u0083\u008c\5\30\r\2\u0084\u008c\5\36\20\2\u0085\u008c\5\"\22\2\u0086"+
+		"\u008c\5\22\n\2\u0087\u008c\5 \21\2\u0088\u008c\5.\30\2\u0089\u008c\5"+
+		"\60\31\2\u008a\u008c\5\62\32\2\u008bv\3\2\2\2\u008bw\3\2\2\2\u008bx\3"+
+		"\2\2\2\u008by\3\2\2\2\u008bz\3\2\2\2\u008b{\3\2\2\2\u008b|\3\2\2\2\u008b"+
+		"}\3\2\2\2\u008b~\3\2\2\2\u008b\177\3\2\2\2\u008b\u0080\3\2\2\2\u008b\u0081"+
+		"\3\2\2\2\u008b\u0082\3\2\2\2\u008b\u0083\3\2\2\2\u008b\u0084\3\2\2\2\u008b"+
+		"\u0085\3\2\2\2\u008b\u0086\3\2\2\2\u008b\u0087\3\2\2\2\u008b\u0088\3\2"+
+		"\2\2\u008b\u0089\3\2\2\2\u008b\u008a\3\2\2\2\u008c\7\3\2\2\2\u008d\u008e"+
+		"\7\36\2\2\u008e\u008f\7\37\2\2\u008f\u0090\5P)\2\u0090\t\3\2\2\2\u0091"+
+		"\u0092\7&\2\2\u0092\u0095\7\37\2\2\u0093\u0094\7*\2\2\u0094\u0096\7\'"+
+		"\2\2\u0095\u0093\3\2\2\2\u0095\u0096\3\2\2\2\u0096\u0097\3\2\2\2\u0097"+
+		"\u0098\5P)\2\u0098\13\3\2\2\2\u0099\u009a\7\36\2\2\u009a\u009b\7>\2\2"+
+		"\u009b\u009c\5T+\2\u009c\u009d\7+\2\2\u009d\u009e\7\34\2\2\u009e\u009f"+
+		"\5Z.\2\u009f\r\3\2\2\2\u00a0\u00a1\7&\2\2\u00a1\u00a4\7>\2\2\u00a2\u00a3"+
+		"\7*\2\2\u00a3\u00a5\7\'\2\2\u00a4\u00a2\3\2\2\2\u00a4\u00a5\3\2\2\2\u00a5"+
+		"\u00a6\3\2\2\2\u00a6\u00a7\5T+\2\u00a7\17\3\2\2\2\u00a8\u00a9\7\36\2\2"+
+		"\u00a9\u00aa\79\2\2\u00aa\u00ab\5R*\2\u00ab\u00ac\7\4\2\2\u00ac\u00b1"+
+		"\5\64\33\2\u00ad\u00ae\7\5\2\2\u00ae\u00b0\5\64\33\2\u00af\u00ad\3\2\2"+
+		"\2\u00b0\u00b3\3\2\2\2\u00b1\u00af\3\2\2\2\u00b1\u00b2\3\2\2\2\u00b2\u00b6"+
+		"\3\2\2\2\u00b3\u00b1\3\2\2\2\u00b4\u00b5\7\5\2\2\u00b5\u00b7\5D#\2\u00b6"+
+		"\u00b4\3\2\2\2\u00b6\u00b7\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8\u00b9\7\6"+
+		"\2\2\u00b9\21\3\2\2\2\u00ba\u00bb\78\2\2\u00bb\u00bc\79\2\2\u00bc\u00bd"+
+		"\5R*\2\u00bd\23\3\2\2\2\u00be\u00bf\7)\2\2\u00bf\u00c4\5J&\2\u00c0\u00c1"+
+		"\7\5\2\2\u00c1\u00c3\5J&\2\u00c2\u00c0\3\2\2\2\u00c3\u00c6\3\2\2\2\u00c4"+
+		"\u00c2\3\2\2\2\u00c4\u00c5\3\2\2\2\u00c5\u00c7\3\2\2\2\u00c6\u00c4\3\2"+
+		"\2\2\u00c7\u00c8\7\62\2\2\u00c8\u00c9\5R*\2\u00c9\u00ca\7;\2\2\u00ca\u00cb"+
+		"\5T+\2\u00cb\25\3\2\2\2\u00cc\u00cd\7\65\2\2\u00cd\u00d2\5J&\2\u00ce\u00cf"+
+		"\7\5\2\2\u00cf\u00d1\5J&\2\u00d0\u00ce\3\2\2\2\u00d1\u00d4\3\2\2\2\u00d2"+
+		"\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3\u00d5\3\2\2\2\u00d4\u00d2\3\2"+
+		"\2\2\u00d5\u00d6\7\62\2\2\u00d6\u00d7\5R*\2\u00d7\u00d8\7(\2\2\u00d8\u00d9"+
+		"\5T+\2\u00d9\27\3\2\2\2\u00da\u00db\7=\2\2\u00db\u00dc\5P)\2\u00dc\31"+
+		"\3\2\2\2\u00dd\u00de\7!\2\2\u00de\u00df\7(\2\2\u00df\u00e2\5R*\2\u00e0"+
+		"\u00e1\7A\2\2\u00e1\u00e3\5:\36\2\u00e2\u00e0\3\2\2\2\u00e2\u00e3\3\2"+
+		"\2\2\u00e3\33\3\2\2\2\u00e4\u00e5\7&\2\2\u00e5\u00e8\79\2\2\u00e6\u00e7"+
+		"\7*\2\2\u00e7\u00e9\7\'\2\2\u00e8\u00e6\3\2\2\2\u00e8\u00e9\3\2\2\2\u00e9"+
+		"\u00ea\3\2\2\2\u00ea\u00eb\5R*\2\u00eb\35\3\2\2\2\u00ec\u00ed\78\2\2\u00ed"+
+		"\u00ee\7 \2\2\u00ee\37\3\2\2\2\u00ef\u00f0\7\64\2\2\u00f0!\3\2\2\2\u00f1"+
+		"\u00f2\78\2\2\u00f2\u00f3\7:\2\2\u00f3#\3\2\2\2\u00f4\u00f5\7,\2\2\u00f5"+
+		"\u00f6\7-\2\2\u00f6\u0102\5R*\2\u00f7\u00f8\7\4\2\2\u00f8\u00fd\5V,\2"+
+		"\u00f9\u00fa\7\5\2\2\u00fa\u00fc\5V,\2\u00fb\u00f9\3\2\2\2\u00fc\u00ff"+
+		"\3\2\2\2\u00fd\u00fb\3\2\2\2\u00fd\u00fe\3\2\2\2\u00fe\u0100\3\2\2\2\u00ff"+
+		"\u00fd\3\2\2\2\u0100\u0101\7\6\2\2\u0101\u0103\3\2\2\2\u0102\u00f7\3\2"+
+		"\2\2\u0102\u0103\3\2\2\2\u0103\u0104\3\2\2\2\u0104\u0105\7?\2\2\u0105"+
+		"\u010a\5&\24\2\u0106\u0107\7\5\2\2\u0107\u0109\5&\24\2\u0108\u0106\3\2"+
+		"\2\2\u0109\u010c\3\2\2\2\u010a\u0108\3\2\2\2\u010a\u010b\3\2\2\2\u010b"+
+		"%\3\2\2\2\u010c\u010a\3\2\2\2\u010d\u010e\7\4\2\2\u010e\u0113\5L\'\2\u010f"+
+		"\u0110\7\5\2\2\u0110\u0112\5L\'\2\u0111\u010f\3\2\2\2\u0112\u0115\3\2"+
+		"\2\2\u0113\u0111\3\2\2\2\u0113\u0114\3\2\2\2\u0114\u0116\3\2\2\2\u0115"+
+		"\u0113\3\2\2\2\u0116\u0117\7\6\2\2\u0117\'\3\2\2\2\u0118\u011a\7\66\2"+
+		"\2\u0119\u011b\t\2\2\2\u011a\u0119\3\2\2\2\u011a\u011b\3\2\2\2\u011b\u011c"+
+		"\3\2\2\2\u011c\u0121\5F$\2\u011d\u011e\7\5\2\2\u011e\u0120\5F$\2\u011f"+
+		"\u011d\3\2\2\2\u0120\u0123\3\2\2\2\u0121\u011f\3\2\2\2\u0121\u0122\3\2"+
+		"\2\2\u0122\u0124\3\2\2\2\u0123\u0121\3\2\2\2\u0124\u0125\7(\2\2\u0125"+
+		"\u012a\5H%\2\u0126\u0127\7\5\2\2\u0127\u0129\5H%\2\u0128\u0126\3\2\2\2"+
+		"\u0129\u012c\3\2\2\2\u012a\u0128\3\2\2\2\u012a\u012b\3\2\2\2\u012b\u012f"+
+		"\3\2\2\2\u012c\u012a\3\2\2\2\u012d\u012e\7A\2\2\u012e\u0130\5:\36\2\u012f"+
+		"\u012d\3\2\2\2\u012f\u0130\3\2\2\2\u0130)\3\2\2\2\u0131\u0132\7\36\2\2"+
+		"\u0132\u0133\7@\2\2\u0133\u0134\5X-\2\u0134\u0135\7\33\2\2\u0135\u0136"+
+		"\5(\25\2\u0136+\3\2\2\2\u0137\u0138\7&\2\2\u0138\u013b\7@\2\2\u0139\u013a"+
+		"\7*\2\2\u013a\u013c\7\'\2\2\u013b\u0139\3\2\2\2\u013b\u013c\3\2\2\2\u013c"+
+		"\u013d\3\2\2\2\u013d\u013e\5X-\2\u013e-\3\2\2\2\u013f\u0140\7<\2\2\u0140"+
+		"\u0141\5R*\2\u0141\u0142\7\67\2\2\u0142\u0143\5V,\2\u0143\u0144\7\b\2"+
+		"\2\u0144\u0147\5B\"\2\u0145\u0146\7A\2\2\u0146\u0148\5:\36\2\u0147\u0145"+
+		"\3\2\2\2\u0147\u0148\3\2\2\2\u0148/\3\2\2\2\u0149\u014a\7B\2\2\u014a\u014b"+
+		"\7C\2\2\u014b\61\3\2\2\2\u014c\u014d\7D\2\2\u014d\63\3\2\2\2\u014e\u014f"+
+		"\5V,\2\u014f\u0153\5\66\34\2\u0150\u0152\58\35\2\u0151\u0150\3\2\2\2\u0152"+
+		"\u0155\3\2\2\2\u0153\u0151\3\2\2\2\u0153\u0154\3\2\2\2\u0154\65\3\2\2"+
+		"\2\u0155\u0153\3\2\2\2\u0156\u015f\7\24\2\2\u0157\u015f\7\25\2\2\u0158"+
+		"\u015f\7\26\2\2\u0159\u015f\7\27\2\2\u015a\u015b\7\30\2\2\u015b\u015c"+
+		"\7\4\2\2\u015c\u015d\7F\2\2\u015d\u015f\7\6\2\2\u015e\u0156\3\2\2\2\u015e"+
+		"\u0157\3\2\2\2\u015e\u0158\3\2\2\2\u015e\u0159\3\2\2\2\u015e\u015a\3\2"+
+		"\2\2\u015f\67\3\2\2\2\u0160\u0161\7\63\2\2\u0161\u0165\7/\2\2\u0162\u0163"+
+		"\7\60\2\2\u0163\u0165\7\61\2\2\u0164\u0160\3\2\2\2\u0164\u0162\3\2\2\2"+
+		"\u01659\3\2\2\2\u0166\u0167\b\36\1\2\u0167\u0168\7\4\2\2\u0168\u0169\5"+
+		":\36\2\u0169\u016a\7\6\2\2\u016a\u016d\3\2\2\2\u016b\u016d\5<\37\2\u016c"+
+		"\u0166\3\2\2\2\u016c\u016b\3\2\2\2\u016d\u0176\3\2\2\2\u016e\u016f\f\5"+
+		"\2\2\u016f\u0170\7\22\2\2\u0170\u0175\5:\36\6\u0171\u0172\f\4\2\2\u0172"+
+		"\u0173\7\23\2\2\u0173\u0175\5:\36\5\u0174\u016e\3\2\2\2\u0174\u0171\3"+
+		"\2\2\2\u0175\u0178\3\2\2\2\u0176\u0174\3\2\2\2\u0176\u0177\3\2\2\2\u0177"+
+		";\3\2\2\2\u0178\u0176\3\2\2\2\u0179\u017a\5B\"\2\u017a\u017b\5@!\2\u017b"+
+		"\u017c\5B\"\2\u017c=\3\2\2\2\u017d\u0180\5N(\2\u017e\u0180\5L\'\2\u017f"+
+		"\u017d\3\2\2\2\u017f\u017e\3\2\2\2\u0180?\3\2\2\2\u0181\u0182\t\3\2\2"+
+		"\u0182A\3\2\2\2\u0183\u0184\b\"\1\2\u0184\u018a\5> \2\u0185\u0186\7\4"+
+		"\2\2\u0186\u0187\5B\"\2\u0187\u0188\7\6\2\2\u0188\u018a\3\2\2\2\u0189"+
+		"\u0183\3\2\2\2\u0189\u0185\3\2\2\2\u018a\u0193\3\2\2\2\u018b\u018c\f\5"+
+		"\2\2\u018c\u018d\t\4\2\2\u018d\u0192\5B\"\6\u018e\u018f\f\4\2\2\u018f"+
+		"\u0190\t\5\2\2\u0190\u0192\5B\"\5\u0191\u018b\3\2\2\2\u0191\u018e\3\2"+
+		"\2\2\u0192\u0195\3\2\2\2\u0193\u0191\3\2\2\2\u0193\u0194\3\2\2\2\u0194"+
+		"C\3\2\2\2\u0195\u0193\3\2\2\2\u0196\u0197\7\63\2\2\u0197\u0198\7/\2\2"+
+		"\u0198\u0199\7\4\2\2\u0199\u019e\5V,\2\u019a\u019b\7\5\2\2\u019b\u019d"+
+		"\5V,\2\u019c\u019a\3\2\2\2\u019d\u01a0\3\2\2\2\u019e\u019c\3\2\2\2\u019e"+
+		"\u019f\3\2\2\2\u019f\u01a1\3\2\2\2\u01a0\u019e\3\2\2\2\u01a1\u01a2\7\6"+
+		"\2\2\u01a2E\3\2\2\2\u01a3\u01aa\7\20\2\2\u01a4\u01a5\5R*\2\u01a5\u01a6"+
+		"\7\7\2\2\u01a6\u01a7\7\20\2\2\u01a7\u01aa\3\2\2\2\u01a8\u01aa\5N(\2\u01a9"+
+		"\u01a3\3\2\2\2\u01a9\u01a4\3\2\2\2\u01a9\u01a8\3\2\2\2\u01aaG\3\2\2\2"+
+		"\u01ab\u01bd\5R*\2\u01ac\u01b5\5R*\2\u01ad\u01af\t\6\2\2\u01ae\u01ad\3"+
+		"\2\2\2\u01ae\u01af\3\2\2\2\u01af\u01b0\3\2\2\2\u01b0\u01b2\7%\2\2\u01b1"+
+		"\u01ae\3\2\2\2\u01b1\u01b2\3\2\2\2\u01b2\u01b3\3\2\2\2\u01b3\u01b4\7."+
+		"\2\2\u01b4\u01b6\5R*\2\u01b5\u01b1\3\2\2\2\u01b6\u01b7\3\2\2\2\u01b7\u01b5"+
+		"\3\2\2\2\u01b7\u01b8\3\2\2\2\u01b8\u01b9\3\2\2\2\u01b9\u01ba\7\62\2\2"+
+		"\u01ba\u01bb\5:\36\2\u01bb\u01bd\3\2\2\2\u01bc\u01ab\3\2\2\2\u01bc\u01ac"+
+		"\3\2\2\2\u01bdI\3\2\2\2\u01be\u01bf\t\7\2\2\u01bfK\3\2\2\2\u01c0\u01c1"+
+		"\t\b\2\2\u01c1M\3\2\2\2\u01c2\u01c3\5R*\2\u01c3\u01c4\7\7\2\2\u01c4\u01c6"+
+		"\3\2\2\2\u01c5\u01c2\3\2\2\2\u01c5\u01c6\3\2\2\2\u01c6\u01c7\3\2\2\2\u01c7"+
+		"\u01c8\5V,\2\u01c8O\3\2\2\2\u01c9\u01ca\7E\2\2\u01caQ\3\2\2\2\u01cb\u01cc"+
+		"\7E\2\2\u01ccS\3\2\2\2\u01cd\u01ce\7E\2\2\u01ceU\3\2\2\2\u01cf\u01d0\7"+
+		"E\2\2\u01d0W\3\2\2\2\u01d1\u01d2\7E\2\2\u01d2Y\3\2\2\2\u01d3\u01d4\7H"+
+		"\2\2\u01d4[\3\2\2\2*ahms\u008b\u0095\u00a4\u00b1\u00b6\u00c4\u00d2\u00e2"+
 		"\u00e8\u00fd\u0102\u010a\u0113\u011a\u0121\u012a\u012f\u013b\u0147\u0153"+
-		"\u015e\u0164\u016c\u0174\u0176\u017f\u0189\u0191\u0193\u019e\u01a9\u01b1"+
-		"\u01b6\u01bf";
+		"\u015e\u0164\u016c\u0174\u0176\u017f\u0189\u0191\u0193\u019e\u01a9\u01ae"+
+		"\u01b1\u01b7\u01bc\u01c5";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

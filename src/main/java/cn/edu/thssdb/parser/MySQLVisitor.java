@@ -518,10 +518,24 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
         if (ctx.getChildCount() == 1) {
             return new TableQuery(visitTable_name(ctx.table_name(0)));
         } else {
+            boolean outerLeft = false;
+            boolean outerRight = false;
+            if (ctx.K_OUTER(0) != null) {
+                if (ctx.K_LEFT(0) != null) {
+                    outerLeft = true;
+                } else if (ctx.K_RIGHT(0) != null) {
+                    outerRight = true;
+                } else {
+                    outerLeft = true;
+                    outerRight = true;
+                }
+            }
             return new TableQuery(
                     visitTable_name(ctx.table_name(0)),
                     visitTable_name(ctx.table_name(1)),
-                    visitMultiple_condition(ctx.multiple_condition()));
+                    visitMultiple_condition(ctx.multiple_condition()),
+                    outerLeft,
+                    outerRight);
         }
     }
 

@@ -30,7 +30,7 @@ public class Table implements Iterable<Row> {
   private BPlusTree<Entry, Row> index;
   private int primaryIndex;
   FileStorage fileStorage;
-  
+
   LockType lockType;
   public ArrayList<Long> S_lock;
   public ArrayList<Long> X_lock;
@@ -82,7 +82,6 @@ public class Table implements Iterable<Row> {
   public int getIndexSize() { return index.size(); }
 
   public ArrayList<Column> getColumns() { return columns; }
-
 
   public void insert(List<String> columnNames, List<List<Value>> values) throws IOException {
     try {

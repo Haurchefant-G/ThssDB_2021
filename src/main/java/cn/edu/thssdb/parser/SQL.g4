@@ -149,7 +149,7 @@ result_column
 
 table_query :
     table_name
-    | table_name ( K_JOIN table_name ) + K_ON multiple_condition ;
+    | table_name ( ( ( K_LEFT | K_RIGHT )? K_OUTER )? K_JOIN table_name ) + K_ON multiple_condition ;
 
 auth_level :
     K_SELECT | K_INSERT | K_UPDATE | K_DELETE | K_DROP ;
@@ -211,6 +211,9 @@ K_DATABASE : D A T A B A S E;
 K_DATABASES : D A T A B A S E S;
 K_DELETE : D E L E T E;
 K_DISTINCT : D I S T I N C T;
+K_LEFT : L E F T;
+K_RIGHT : R I G H T;
+K_OUTER : O U T E R;
 K_DROP : D R O P;
 K_EXISTS : E X I S T S;
 K_FROM : F R O M;

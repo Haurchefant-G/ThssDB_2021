@@ -36,8 +36,13 @@ public class Row implements Serializable {
     if (entries == null)
       return "EMPTY";
     StringJoiner sj = new StringJoiner(",");
-    for (Entry e : entries)
-      sj.add(e.toString());
+    for (Entry e : entries) {
+      if (e != null) {
+        sj.add(e.toString());
+      } else {
+        sj.add("null");
+      }
+    }
     return sj.toString();
   }
 
@@ -60,5 +65,17 @@ public class Row implements Serializable {
   public Comparable valueOf(int index) {
     Entry entry = entries.get(index);
     return entry != null ? entry.value : null;
+  }
+
+  @Override
+  public int hashCode() {
+    return entries.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    return entries.equals(((Row) o).entries);
   }
 }

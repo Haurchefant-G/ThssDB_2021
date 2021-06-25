@@ -4,10 +4,8 @@ import cn.edu.thssdb.exception.ColumnNotExistException;
 import cn.edu.thssdb.exception.DuplicateColumnException;
 import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Row;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+
+import java.util.*;
 import java.util.function.Predicate;
 
 public class QueryResult {
@@ -15,31 +13,35 @@ public class QueryResult {
   public List<MetaInfo> metaInfos = new ArrayList<>();
   public List<Integer> index = new ArrayList<>();
   public Predicate<Row> predicate;
-  public List<Row> results = new ArrayList<>();
+  public Collection<Row> results;
   Stack<Row> rows = new Stack<>();
 
   public List<String> columnNames;
   public boolean asterisk = false;
 
-  boolean distinct = false;
+  boolean distinct;
 
-
-    public QueryResult(List<QueryTable> queryTables, List<String> columnNames, Where where, boolean distinct) {
-      this.queryTables = queryTables;
-      this.distinct = distinct;
-      this.columnNames = columnNames;
-
-      for (QueryTable table : queryTables) {
-        metaInfos.addAll(table.getMetaInfo());
-      }
-
-      if (where != null) {
-        predicate = where.parse(metaInfos);
-      }
-
-      buildIndex();
-      getAllQuery();
+  public QueryResult(List<QueryTable> queryTables, List<String> columnNames, Where where, boolean distinct) {
+    this.queryTables = queryTables;
+    this.distinct = distinct;
+    if (this.distinct) {
+      results = new HashSet<>();
+    } else {
+      results = new ArrayList<>();
     }
+    this.columnNames = columnNames;
+
+    for (QueryTable table : queryTables) {
+      metaInfos.addAll(table.getMetaInfo());
+    }
+
+    if (where != null) {
+      predicate = where.parse(metaInfos);
+    }
+
+    buildIndex();
+    getAllQuery();
+  }
 
     private void buildIndex() {
       if (columnNames == null) {
@@ -189,7 +191,7 @@ public class QueryResult {
     return predicate;
   }
 
-  public List<Row> getResults() {
+  public Collection<Row> getResults() {
     return results;
   }
 
