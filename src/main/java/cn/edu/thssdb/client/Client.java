@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -197,9 +198,30 @@ public class Client {
       ExecuteStatementResp resp = client.executeStatement(req);
       if (resp.getStatus().getCode() != Global.SUCCESS_CODE) {
         //return false;
+        println("");
+        println(resp.getStatus().getMsg());
+        println("");
+        return;
       }
-      println(String.valueOf(resp.getStatus().getCode()));
+      // println(String.valueOf(resp.getStatus().getCode()));
+      println("");
       println(resp.getStatus().getMsg());
+      if (resp.isHasResult()) {
+        for (String col: resp.getColumnsList()) {
+          print(col);
+          print("    ");
+        }
+        println("");
+        println("--------");
+        for (List<String> row: resp.getRowList()) {
+          for (String cell: row) {
+            print(cell);
+            print("    ");
+            println("");
+          }
+        }
+      }
+      println("");
     } catch (TException e) {
       logger.error(e.getMessage());
     }

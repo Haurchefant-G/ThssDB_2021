@@ -371,6 +371,9 @@ public class Manager {
 
     public void createTable(String tableName, ArrayList<Column> columns, Session session) {
       Database database = session.getDatabase();
+      if (database == null) {
+        throw new NoDatabaseBeingUsedException();
+      }
       try {
         database.lock.writeLock().lock();
         database.create(tableName, columns);

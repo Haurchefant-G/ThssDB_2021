@@ -105,7 +105,7 @@ public class SQLProcessor {
 
     public SQLResult showDatabase(ShowDatabasesStatement statement, Session session) {
         try {
-            List<String> heads = Arrays.asList("Database Name");
+            List<String> heads = Arrays.asList("DatabaseName");
             List<String> databaseNames = manager.getDatabases(session);
             List<List<String>> stackDatabaseNames = databaseNames.stream().map(Arrays::asList).collect(Collectors.toList());
 
@@ -117,7 +117,7 @@ public class SQLProcessor {
 
     public SQLResult showTables(ShowTablesStatement statement, Session session) {
         try {
-            List<String> heads = Arrays.asList("Table Name");
+            List<String> heads = Arrays.asList("TableName");
             List<String> tableNames = manager.getTables(statement.getDatabaseName(), session);
             List<List<String>> stackTableNames = tableNames.stream().map(Arrays::asList).collect(Collectors.toList());
 

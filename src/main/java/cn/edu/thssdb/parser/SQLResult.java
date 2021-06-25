@@ -20,6 +20,9 @@ public class SQLResult {
         this.columnList = columnList;
         this.rowList = rowList;
         this.succeed = succeed;
+        if (succeed && rowList.size() > 0) {
+            this.hasResult = true;
+        }
     }
 
     public String getMsg() {
