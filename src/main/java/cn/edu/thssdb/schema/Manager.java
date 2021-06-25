@@ -298,6 +298,7 @@ public class Manager {
         bw.newLine();
       }
       bw.close();
+      fw.close();
     } catch (IOException e) {
       e.printStackTrace();
     }

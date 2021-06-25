@@ -8,15 +8,16 @@ import cn.edu.thssdb.server.Session;
 import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.type.ColumnType;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class MySQLProcessorTest {
     private static final ThssDB thssDB = ThssDB.getInstance();
     private static final Manager manger = Manager.getInstance();
+    private static final UserManager userManger = UserManager.getInstance();
     private static final SQLProcessor sqlProcessor = new SQLProcessor(manger);
     private static final long sessionId = thssDB.setupSession();
     private static final Session session = manger.getSession(sessionId);
@@ -61,8 +62,16 @@ public class MySQLProcessorTest {
         CreateUserStatement statement = (CreateUserStatement) sqlProcessor.parseSQL(sql).get(0);
         assert statement.getType() == StatementType.CREATE_USER;
         assert statement.getUsername().equals("liqi");
-        assert statement.getPassword().equals("'123456'");
-        // TODO:
+        System.out.println(statement.getPassword());
+        assert statement.getPassword().equals("123456");
+        SQLResult sqlResult = sqlProcessor.createUser(statement, session);
+        assert sqlResult.isSucceed();
+        assert userManger.login(statement.getUsername(), statement.getPassword());
+
+        File f = new File(".users");
+        if(f.exists()) {
+           f.delete();
+        }
     }
 
     /*
@@ -71,6 +80,11 @@ public class MySQLProcessorTest {
      */
     @Test
     public void testDropDb() {
+        File f = new File(".users");
+        if(f.exists()) {
+            f.delete();
+        }
+
         String sql = "drop database test;";
 
         DropDatabaseStatement statement = (DropDatabaseStatement) sqlProcessor.parseSQL(sql).get(0);
@@ -80,6 +94,11 @@ public class MySQLProcessorTest {
         SQLResult sqlResult = sqlProcessor.dropDatabase(statement, session);
         assert sqlResult.isSucceed();
         assert manger.getDatabase("test") == null;
+
+        File f2 = new File(".users");
+        if(f2.exists()) {
+            f2.delete();
+        }
     }
 
     /*
@@ -88,11 +107,28 @@ public class MySQLProcessorTest {
      */
     @Test
     public void testDropUser() {
-        String sql = "drop user liqi;";
+        File f = new File(".users");
+        if(f.exists()) {
+            f.delete();
+        }
 
-        DropUserStatement statement = (DropUserStatement) sqlProcessor.parseSQL(sql).get(0);
-        assert statement.getType() == StatementType.DROP_USER;
-        assert statement.getUserName().equals("liqi");
+        String sql = "create user liqi2 identified by '123456';";
+        CreateUserStatement statement = (CreateUserStatement) sqlProcessor.parseSQL(sql).get(0);
+        SQLResult sqlResult = sqlProcessor.createUser(statement, session);
+
+        sql = "drop user liqi2;";
+
+        DropUserStatement statement2 = (DropUserStatement) sqlProcessor.parseSQL(sql).get(0);
+        assert statement2.getType() == StatementType.DROP_USER;
+        assert statement2.getUserName().equals("liqi2");
+        SQLResult sqlResult2 = sqlProcessor.dropUser(statement2, session);
+        assert sqlResult2.isSucceed();
+        assert !userManger.existUser(statement2.getUserName());
+
+        File f2 = new File(".users");
+        if(f2.exists()) {
+            f2.delete();
+        }
     }
 
     /*
@@ -218,17 +254,17 @@ public class MySQLProcessorTest {
         assert statement.getTableName().equals("person");
         assert statement.getColumnNames().get(0).equals("name");
         assert statement.getColumnNames().get(1).equals("age");
-        assert statement.getValues().get(0).get(0).getValue().equals("'liqi'");
+        assert statement.getValues().get(0).get(0).getValue().equals("liqi");
         assert ((Number)statement.getValues().get(0).get(1).getValue()).intValue() == 20;
-        assert statement.getValues().get(1).get(0).getValue().equals("'guiacan'");
+        assert statement.getValues().get(1).get(0).getValue().equals("guiacan");
         assert ((Number)statement.getValues().get(1).get(1).getValue()).intValue() == 21;
 
         SQLResult sqlResult = sqlProcessor.insert(statement, session);
         assert sqlResult.isSucceed();
         Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
 
-        assert table.hasKey(new Entry("'liqi'"));
-        assert table.hasKey(new Entry("'guiacan'"));
+        assert table.hasKey(new Entry("liqi"));
+        assert table.hasKey(new Entry("guiacan"));
 
         testCommit();
     }
@@ -247,12 +283,12 @@ public class MySQLProcessorTest {
         UpdateStatement statement = (UpdateStatement) sqlProcessor.parseSQL(sql).get(0);
         assert statement.getType() == StatementType.UPDATE;
         assert statement.getTableName().equals("person");
-        assert statement.getExpression().getValue().getValue().equals("'qiqi'");
+        assert statement.getExpression().getValue().getValue().equals("qiqi");
 
         SQLResult sqlResult = sqlProcessor.update(statement, session);
         assert sqlResult.isSucceed();
         Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
-        assert table.hasKey(new Entry("'qiqi'"));
+        assert table.hasKey(new Entry("qiqi"));
 
         testCommit();
     }
@@ -271,13 +307,13 @@ public class MySQLProcessorTest {
         assert statement.getType() == StatementType.DELETE;
         assert statement.getTableName().equals("person");
         assert statement.getWhere().getCondition().getLeft().getValue().getValue().equals("name");
-        assert statement.getWhere().getCondition().getRight().getValue().getValue().equals("'liqi'");
+        assert statement.getWhere().getCondition().getRight().getValue().getValue().equals("liqi");
 
         Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
-        assert table.hasKey(new Entry("'liqi'"));
+        assert table.hasKey(new Entry("liqi"));
         SQLResult sqlResult = sqlProcessor.delete(statement, session);
         assert sqlResult.isSucceed();
-        assert !table.hasKey(new Entry("'liqi'"));
+        assert !table.hasKey(new Entry("liqi"));
 
         testCommit();
     }
@@ -386,8 +422,8 @@ public class MySQLProcessorTest {
         assert sqlResult.isSucceed();
         assert sqlResult.getColumnList().get(0).equals("person.name");
         assert sqlResult.getColumnList().get(1).equals("book.name");
-        assert sqlResult.getRowList().get(0).get(0).equals("'liqi'");
-        assert sqlResult.getRowList().get(0).get(1).equals("'english'");
+        assert sqlResult.getRowList().get(0).get(0).equals("liqi");
+        assert sqlResult.getRowList().get(0).get(1).equals("english");
 
         testCommit();
     }

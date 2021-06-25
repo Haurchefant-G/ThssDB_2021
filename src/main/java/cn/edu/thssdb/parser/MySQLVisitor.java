@@ -560,7 +560,7 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
                 return new Value(ctx.getText(), ValueType.INT);
             }
         } else if (ctx.STRING_LITERAL() != null) {
-            return new Value(ctx.getText(), ValueType.STRING);
+            return new Value(ctx.getText().substring(1, ctx.getText().length()-1), ValueType.STRING);
         }
         return new Value(null, ValueType.NULL);
     }
@@ -630,6 +630,6 @@ public class MySQLVisitor extends SQLBaseVisitor<Object> {
      */
     @Override
     public String visitPassword(SQLParser.PasswordContext ctx) {
-        return ctx.STRING_LITERAL().getText();
+        return ctx.STRING_LITERAL().getText().substring(1, ctx.getText().length()-1);
     }
 }

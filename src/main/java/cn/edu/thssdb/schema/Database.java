@@ -78,6 +78,7 @@ public class Database {
         bw.newLine();
       }
       bw.close();
+      fw.close();
     } catch (IOException e) {
       e.printStackTrace();
     }

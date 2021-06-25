@@ -41,6 +41,8 @@ public class UserManager {
                 User user = new User(s[1], permission);
                 users.put(s[0], user);
             }
+            br.close();
+            fr.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -62,6 +64,7 @@ public class UserManager {
                 bw.newLine();
             }
             bw.close();
+            fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -97,6 +100,10 @@ public class UserManager {
         }
         users.remove(username);
         persist();
+    }
+
+    public boolean existUser(String username) {
+        return users.containsKey(username);
     }
 
     public static class UserManagerHolder {
