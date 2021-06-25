@@ -190,12 +190,14 @@ public class Client {
     try {
       ConnectResp resp = client.connect(req);
       if (resp.getStatus().getCode() != Global.SUCCESS_CODE) {
+        println(resp.getStatus().getMsg());
         return false;
       }
       sessionId = resp.getSessionId();
     } catch (TException e) {
       logger.error(e.getMessage());
     }
+    println("login successfully!");
     return true;
   }
 

@@ -5,15 +5,15 @@ import cn.edu.thssdb.type.UserPermission;
 
 public class User {
 
-    public String password;
-    public UserPermission userPermission;
+    private String password;
+    private UserPermission userPermission;
 
-    public User(String password, UserPermission userPermission) {
+    User(String password, UserPermission userPermission) {
         this.password = password;
         this.userPermission = userPermission;
     }
 
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 

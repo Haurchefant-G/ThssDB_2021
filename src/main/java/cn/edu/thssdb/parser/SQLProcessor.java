@@ -4,6 +4,7 @@ import cn.edu.thssdb.parser.statement.*;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.server.Session;
+import cn.edu.thssdb.type.UserPermission;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 public class SQLProcessor {
     Manager manager;
+    UserManager userManager = UserManager.getInstance();
 
 
     public SQLProcessor(Manager manager) {
@@ -169,11 +171,21 @@ public class SQLProcessor {
 
     // 用户
     public SQLResult dropUser(DropUserStatement statement, Session session) {
-        return null;
+        try {
+            userManager.delete(statement.getUserName());
+            return new SQLResult("Drop user " + statement.getUserName(), true);
+        } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
     }
 
     public SQLResult createUser(CreateUserStatement statement, Session session) {
-        return null;
+        try {
+            userManager.register(statement.getUsername(), statement.getPassword(), UserPermission.USER);
+            return new SQLResult("Register user " + statement.getUsername(), true);
+        } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
     }
 
 

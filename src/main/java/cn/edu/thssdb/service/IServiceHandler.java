@@ -1,5 +1,7 @@
 package cn.edu.thssdb.service;
 
+import cn.edu.thssdb.exception.NoSuchUserException;
+import cn.edu.thssdb.exception.WrongPasswordException;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnetReq;
@@ -11,6 +13,7 @@ import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.parser.SQLResult;
+import cn.edu.thssdb.schema.UserManager;
 import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.TException;
@@ -30,6 +33,14 @@ public class IServiceHandler implements IService.Iface {
   @Override
   public ConnectResp connect(ConnectReq req) throws TException {
     // TODO: password check?
+    try {
+      UserManager.getInstance().login(req.username, req.password);
+    } catch (Exception e) {
+      Status status = new Status(Global.FAILURE_CODE);
+      status.msg = e.getMessage();
+      ConnectResp resp = new ConnectResp(status, -1);
+      return resp;
+    }
     Status status = new Status(Global.SUCCESS_CODE);
     long sessionId = ThssDB.getInstance().setupSession();
     ConnectResp resp = new ConnectResp(status, sessionId);

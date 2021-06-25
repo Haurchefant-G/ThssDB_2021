@@ -3,6 +3,7 @@ package cn.edu.thssdb.server;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.parser.SQLResult;
+import cn.edu.thssdb.schema.UserManager;
 import cn.edu.thssdb.service.IServiceHandler;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.server.TServer;
@@ -24,6 +25,8 @@ public class ThssDB {
   private static TServer server;
 
   private static Manager manager = Manager.getInstance();
+
+  private static UserManager userManager = UserManager.getInstance();
 
   private static long sessionNumber = 0;
 
