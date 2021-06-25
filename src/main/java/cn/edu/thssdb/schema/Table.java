@@ -12,7 +12,6 @@ import cn.edu.thssdb.type.LockType;
 import cn.edu.thssdb.utils.FileStorage;
 import cn.edu.thssdb.utils.Page;
 import cn.edu.thssdb.utils.Pair;
-import sun.jvm.hotspot.ui.action.MemoryAction;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -26,16 +25,63 @@ import java.util.function.Predicate;
 public class Table implements Iterable<Row> {
   ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String databaseName;
-  public String tableName;
-  public ArrayList<Column> columns;
-  public BPlusTree<Entry, Row> index;
+  private String tableName;
+  private ArrayList<Column> columns;
+  private BPlusTree<Entry, Row> index;
   private int primaryIndex;
-  private FileStorage fileStorage;
+  FileStorage fileStorage;
 
   LockType lockType;
   public ArrayList<Long> S_lock;
   public ArrayList<Long> X_lock;
 
+  /**
+   * 创建表并设置表所在的数据库
+   * @param databaseName 数据库名
+   * @param tableName 表名
+   * @param columns 表头
+   */
+  public Table(String databaseName, String tableName, ArrayList<Column> columns) {
+    // TODO
+    this.databaseName = databaseName;
+    this.tableName = tableName;
+    this.columns = columns;
+    this.primaryIndex = 0;
+    for (int i = 1; i < columns.size(); ++i) {
+      if (columns.get(this.primaryIndex).getPrimary() < columns.get(i).getPrimary()) {
+        this.primaryIndex = i;
+      }
+    }
+    this.S_lock = new ArrayList<Long>();
+    this.X_lock = new ArrayList<Long>();
+    this.lockType = LockType.NONE;
+
+    try {
+      recover();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * 设置表所在的数据库
+   * @param name 数据库名
+   */
+  public void setDatabaseName(String name) {
+    this.databaseName = name;
+  }
+
+  /**
+   * 获取表的名字
+   * @return 表明
+   */
+  public String getTableName() {
+    return this.tableName;
+  }
+
+  public int getIndexSize() { return index.size(); }
+
+  public ArrayList<Column> getColumns() { return columns; }
 
   public void insert(List<String> columnNames, List<List<Value>> values) throws IOException {
     try {
@@ -93,7 +139,7 @@ public class Table implements Iterable<Row> {
     }
   }
 
-  public int update(String columnName, Expression expression, Where condition) {
+  public int update(String columnName, Expression expression, Where condition) throws IOException {
     try {
       lock.writeLock().lock();
       Column column = null;
@@ -124,15 +170,16 @@ public class Table implements Iterable<Row> {
           Comparable value = func.apply(row);
           value = Value.adaptToColumnType(value, column);
           Entry newEntry = new Entry(value);
+          if (column.isPrimary() && index.contains(newEntry)) {
+            throw new PrimaryKeyViolationException();
+          }
+
           Entry oldEntry = row.getEntry(primaryIndex);
           row.entries.set(colIdx, newEntry);
+          fileStorage.updateRowInPage(row.page, row.offset, row);
           if (column.isPrimary()) {
             index.remove(oldEntry);
-            if (index.contains(newEntry)) {
-              index.update(newEntry, row);
-            } else {
-              index.put(newEntry, row);
-            }
+            index.put(newEntry, row);
           }
         }
       }
@@ -157,32 +204,6 @@ public class Table implements Iterable<Row> {
   interface writeIndex {
     void write(Comparable dataouput) throws IOException;
   };
-
-  /**
-   * 创建表
-   * @param tableName 表名
-   * @param columns 表头
-   */
-  public Table(String tableName, ArrayList<Column> columns) {
-    this.tableName = tableName;
-    this.columns = columns;
-    this.primaryIndex = 0;
-    this.index = new BPlusTree<>();
-    for (int i = 1; i < columns.size(); ++i) {
-      if (columns.get(this.primaryIndex).getPrimary() < columns.get(i).getPrimary()) {
-        this.primaryIndex = i;
-      }
-    }
-    this.S_lock = new ArrayList<Long>();
-    this.X_lock = new ArrayList<Long>();
-    this.lockType = LockType.NONE;
-
-    try {
-      recover();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   public int add_S_lock(long session){
     if (lockType.equals(LockType.X))
@@ -250,64 +271,12 @@ public class Table implements Iterable<Row> {
   }
 
   /**
-   * 设置表所在的数据库
-   * @param name 数据库名
-   */
-  public void setDatabaseName(String name) {
-    this.databaseName = name;
-  }
-
-  /**
-   * 获取表的名字
-   * @return 表明
-   */
-  public String getTableName() {
-    return this.tableName;
-  }
-
-  /**
-   * 创建表并设置表所在的数据库
-   * @param databaseName 数据库名
-   * @param tableName 表名
-   * @param columns 表头
-   */
-  public Table(String databaseName, String tableName, ArrayList<Column> columns) {
-    // TODO
-    this.databaseName = databaseName;
-    this.tableName = tableName;
-    this.columns = columns;
-    this.primaryIndex = 0;
-    this.index = new BPlusTree<>();
-    for (int i = 1; i < columns.size(); ++i) {
-      if (columns.get(this.primaryIndex).getPrimary() < columns.get(i).getPrimary()) {
-        this.primaryIndex = i;
-      }
-    }
-    this.S_lock = new ArrayList<Long>();
-    this.X_lock = new ArrayList<Long>();
-    this.lockType = LockType.NONE;
-
-    try {
-      recover();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-//  /**
-//   * 设置表对应存储文件（重启数据库时根据元数据设置）
-//   * @param name 文件名
-//   */
-//  public void setFile(String name) {
-//    fileStorage = new FileStorage(name, columns);
-//  }
-
-  /**
    * 恢复table，创建对应的存储管理，根据index文件恢复BPlustree
    * @throws IOException
    */
   private void recover() throws IOException {
     // TODO
+    this.index = new BPlusTree<>();
     fileStorage = new FileStorage(tableName + ".table", columns);
     File f = new File(tableName + ".index");
     try {
@@ -354,10 +323,9 @@ public class Table implements Iterable<Row> {
   /**
    * 清空删除表
    */
-  public void clear() {
+  void clear() {
     fileStorage.close();
     fileStorage = null;
-    columns.clear();
     columns = null;
     index = null;
     File f = new File(tableName + ".table");
@@ -373,12 +341,11 @@ public class Table implements Iterable<Row> {
   /**
    * 关闭表，维护存储文件和index文件
    */
-  public void close() {
+  void close() {
     try {
       persist();
       fileStorage.close();
       fileStorage = null;
-      columns.clear();
       columns = null;
       index = null;
     } catch (IOException e) {
@@ -386,11 +353,11 @@ public class Table implements Iterable<Row> {
     }
   }
 
-  public void commit() {
+  void commit() {
     try {
       persist();
       fileStorage.closeFile();
-      fileStorage.openFile();
+      // fileStorage.openFile();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -446,7 +413,7 @@ public class Table implements Iterable<Row> {
    * @param row
    * @throws IOException
    */
-  public void insert(Row row) throws IOException {
+  void insert(Row row) throws IOException {
     // TODO
     Entry primary = row.getEntries().get(primaryIndex);
     if (hasKey(primary)) {
@@ -461,13 +428,13 @@ public class Table implements Iterable<Row> {
    * @param row
    * @throws IOException
    */
-  public void delete(Row row) throws IOException {
+  void delete(Row row) throws IOException {
     // TODO
     fileStorage.deleteFromPage(row.page, row.offset);
     index.remove(row.getEntry(primaryIndex));
   }
 
-  public int delete(Where condition) {
+  int delete(Where condition) throws IOException {
     Predicate<Row> predicate = null;
     if (condition != null) {
       predicate = condition.parse(new ArrayList<MetaInfo>() {{
@@ -479,8 +446,7 @@ public class Table implements Iterable<Row> {
       int num = 0;
       for (Row row : this) {
         if (predicate == null || predicate.test(row)) {
-          Entry key = row.getEntry(primaryIndex);
-          index.remove(key);
+          delete(row);
           num++;
         }
       }
@@ -489,31 +455,6 @@ public class Table implements Iterable<Row> {
       lock.writeLock().unlock();
     }
   }
-
-//  public void deleteAll() {
-//    fileStorage.clearAll();
-//  }
-
-  /**
-   * 更新一行
-   * @param oldrow
-   * @param newrow
-   * @throws IOException
-   */
-  public void update(Row oldrow, Row newrow) throws IOException {
-    // TODO
-    fileStorage.updateRowInPage(oldrow.page, oldrow.offset, newrow);
-    index.update(newrow.getEntry(primaryIndex), newrow);
-  }
-
-//  private void serialize() {
-//    // TODO
-//  }
-//
-//  private ArrayList<Row> deserialize() {
-//    // TODO
-//    return null;
-//  }
 
   private class TableIterator implements Iterator<Row> {
     private Iterator<Pair<Entry, Row>> iterator;

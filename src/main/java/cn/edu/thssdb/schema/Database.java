@@ -4,6 +4,7 @@ import cn.edu.thssdb.exception.TableExistException;
 import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
+import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
 import cn.edu.thssdb.query.Where;
@@ -26,6 +27,7 @@ public class Database {
   private HashMap<String, Table> tables;
   ReentrantReadWriteLock lock;
   private boolean open;
+  private int sessionNum;
 
   /**
    * 创建数据库
@@ -36,6 +38,7 @@ public class Database {
     this.tables = new HashMap<>();
     this.lock = new ReentrantReadWriteLock();
     this.open = false;
+    this.sessionNum = 0;
   }
 
   /**
@@ -57,7 +60,7 @@ public class Database {
       for(Table table : tables.values()) {
         String line = "CREATE TABLE " + table.getTableName() + "(";
         ArrayList<String> primary = new ArrayList<String>();
-        Iterator<Column> i = table.columns.iterator();
+        Iterator<Column> i = table.getColumns().iterator();
         while(i.hasNext()) {
           Column column = i.next();
           String c = column.getName() + " " + column.getType().toString();
@@ -160,8 +163,8 @@ public class Database {
         SQLLexer lexer = new SQLLexer(stream);
         CommonTokenStream token = new CommonTokenStream(lexer);
         SQLParser parser = new SQLParser(token);
-        Table table =tableMeta.visitCreate_table_stmt(parser.create_table_stmt());
-        table.setDatabaseName(name);
+        MetaInfo meta = tableMeta.visitCreate_table_stmt(parser.create_table_stmt());
+        Table table = new Table(name, meta.getTableName(), meta.getColumns());
         tables.put(table.getTableName(), table);
         line = br.readLine();
       }
@@ -177,16 +180,18 @@ public class Database {
    */
   public void quit() {
     // TODO
-    lock.writeLock().lock();
-    if (open) {
-      persist();
-      for(Table table: tables.values()) {
-        table.close();
+    if (sessionNum == 0) {
+      lock.writeLock().lock();
+      if (open) {
+        persist();
+        for (Table table : tables.values()) {
+          table.close();
+        }
+        tables = null;
+        open = false;
       }
-      tables = null;
-      open = false;
+      lock.writeLock().unlock();
     }
-    lock.writeLock().unlock();
   }
 
   /**
@@ -199,51 +204,7 @@ public class Database {
     if (table == null) {
       return null;
     }
-    return table.columns;
-  }
-
-  /**
-   * 向一张表插入一行
-   * @param tableName
-   * @param row
-   */
-  public void insertRow(String tableName, Row row) {
-    try {
-      tables.get(tableName).insert(row);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * 删除多行
-   * @param tableName
-   * @param rows
-   */
-  public void deleteRows(String tableName, ArrayList<Row> rows) {
-    try {
-      Table table = tables.get(tableName);
-      for(Row r:rows) {
-        table.delete(r);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void updateRows(String tableName, ArrayList<Row> oldrows, ArrayList<Row> newrows) {
-    try {
-      Table table = tables.get(tableName);
-      Iterator<Row> i;
-      Iterator<Row> j;
-      for(i = oldrows.iterator(), j = newrows.iterator(); i.hasNext();) {
-        Row oldrow = i.next();
-        Row newrow = j.next();
-        table.update(oldrow, newrow);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    return table.getColumns();
   }
 
   public void commitTable(String tablename) {
@@ -275,5 +236,23 @@ public class Database {
     } finally {
       lock.readLock().unlock();
     }
+  }
+
+  public void registerSession() {
+    ++sessionNum;
+  }
+
+  public void logoutSession() {
+    --sessionNum;
+  }
+
+  public int getSessionNum() {
+    return sessionNum;
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    quit();
   }
 }

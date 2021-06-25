@@ -7,7 +7,7 @@ import cn.edu.thssdb.type.UserPermission;
 
 import java.util.HashMap;
 
-public class UserManagers {
+public class UserManager {
     HashMap<String, User> users;
 
     public User login(String username, String password) {

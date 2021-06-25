@@ -15,7 +15,7 @@ public class SingleTable implements QueryTable {
     public SingleTable(Table table) {
         this.table = table;
         this.iterator = table.iterator();
-        metaInfo = new MetaInfo(table.getTableName(), table.columns);
+        metaInfo = new MetaInfo(table.getTableName(), table.getColumns());
     }
 
     @Override

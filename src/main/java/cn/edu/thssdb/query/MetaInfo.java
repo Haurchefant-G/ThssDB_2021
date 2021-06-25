@@ -8,7 +8,7 @@ import java.util.List;
 public class MetaInfo {
 
   private String tableName;
-  private List<Column> columns;
+  private ArrayList<Column> columns;
 
   public MetaInfo(String tableName, ArrayList<Column> columns) {
     this.tableName = tableName;
@@ -47,7 +47,7 @@ public class MetaInfo {
     return tableName;
   }
 
-  public List<Column> getColumns() {
+  public ArrayList<Column> getColumns() {
     return columns;
   }
 }

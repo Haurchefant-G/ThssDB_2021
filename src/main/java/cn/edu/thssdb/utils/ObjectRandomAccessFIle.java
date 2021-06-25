@@ -1,9 +1,5 @@
 package cn.edu.thssdb.utils;
 
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-
 import java.io.*;
 
 public class ObjectRandomAccessFIle extends RandomAccessFile implements ObjectInput, ObjectOutput {

@@ -42,7 +42,16 @@ public class Session {
     }
 
     public void setDatabase(Database database) {
+        database.start();
         this.database = database;
+    }
+
+    public void destroy() {
+        if (database != null) {
+            database.logoutSession();
+            database.quit();
+            database = null;
+        }
     }
 
     public ReentrantReadWriteLock.WriteLock getWriteLock() {
@@ -61,4 +70,9 @@ public class Session {
         this.lock = lock;
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        destroy();
+    }
 }

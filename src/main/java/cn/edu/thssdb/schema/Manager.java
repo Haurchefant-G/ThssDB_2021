@@ -8,10 +8,8 @@ import cn.edu.thssdb.parser.SQLResult;
 import cn.edu.thssdb.parser.statement.Statement;
 import cn.edu.thssdb.parser.statement.StatementType;
 import cn.edu.thssdb.query.*;
-import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.DatabaseMetaVisitor;
 import cn.edu.thssdb.server.Session;
-import javafx.scene.control.Tab;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -57,6 +55,7 @@ public class Manager {
       if (session.getSessionId() == sessionId) {
         session.getLock().writeLock().unlock();
         session.getLock().readLock().unlock();
+        session.destroy();
         sessionList.remove(session);
         break;
       }
@@ -361,7 +360,7 @@ public class Manager {
       Table table = database.getTable(tableName);
 
       List<List<String>> tableMeta = new ArrayList<>();
-      for (Column column : table.columns) {
+      for (Column column : table.getColumns()) {
         tableMeta.add(column.getMetaList());
       }
       return tableMeta;
@@ -468,7 +467,7 @@ public class Manager {
       return null;
   }
 
-  public int delete(String tableName, Where condition, Session session) {
+  public int delete(String tableName, Where condition, Session session) throws IOException {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
 
@@ -482,7 +481,7 @@ public class Manager {
       return -1;
   }
 
-  public int update(String tableName, String columnName, Expression expression, Where condition, Session session) {
+  public int update(String tableName, String columnName, Expression expression, Where condition, Session session) throws IOException {
     Database database = session.getDatabase();
     Table table = database.getTable(tableName);
 
@@ -519,8 +518,10 @@ public class Manager {
       transactionManager.remove_session(session_id);
 
       ArrayList<String> table_list = transactionManager.get_X_lock(session_id);
-      for (String table_name : table_list)
+      for (String table_name : table_list) {
+        database.commitTable(table_name);
         database.getTable(table_name).free_X_lock(session_id);
+      }
       table_list.clear();
       transactionManager.put_X_lock(session_id, table_list);
 
@@ -536,6 +537,10 @@ public class Manager {
     }
     Database database = databases.get(databaseName);
     return Arrays.asList(database.getTables().keySet().toArray(new String[0]));
+  }
+
+  public List<String> getDatabases(Session session) {
+    return Arrays.asList(databases.keySet().toArray(new String[0]));
   }
 
   public static class ManagerHolder {

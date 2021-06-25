@@ -28,7 +28,7 @@ public class JointTable implements QueryTable {
         this.outerRight = outerRight;
         this.iterLeft = tableLeft.iterator();
         this.iterRight = tableRight.iterator();
-        this.metaInfos = Arrays.asList(new MetaInfo(tableLeft.getTableName(), tableLeft.columns), new MetaInfo(tableRight.getTableName(), tableRight.columns));
+        this.metaInfos = Arrays.asList(new MetaInfo(tableLeft.getTableName(), tableLeft.getColumns()), new MetaInfo(tableRight.getTableName(), tableRight.getColumns()));
         this.join = where.parse(metaInfos);
         pushNextLegalRowToBuffer();
     }
@@ -59,7 +59,7 @@ public class JointTable implements QueryTable {
     }
 
     private void pushLeftOuterRowToBuffer() {
-        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(tableRight.columns.size(), null));
+        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(tableRight.getColumns().size(), null));
         Row emptyRow = new Row(entries);
 
         for (Row rowLeft : tableLeft) {
@@ -74,7 +74,7 @@ public class JointTable implements QueryTable {
     }
 
     private void pushRightOuterRowToBuffer() {
-        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(tableLeft.columns.size(), null));
+        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(tableLeft.getColumns().size(), null));
         Row emptyRow = new Row(entries);
 
         for (Row rowRight : tableRight) {
