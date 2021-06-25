@@ -9,7 +9,9 @@ import cn.edu.thssdb.server.ThssDB;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.type.ValueType;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.util.List;
 

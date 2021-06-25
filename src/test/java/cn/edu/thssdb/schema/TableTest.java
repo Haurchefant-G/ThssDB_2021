@@ -24,11 +24,11 @@ public class TableTest {
     static Row row;
     static String tableName;
     static Table table;
-    static String databaseName = "test";
+    static String databaseName = "testTable";
 
     @BeforeClass
     public static void setup() throws NoSuchFieldException, IllegalAccessException {
-        String line = "CREATE TABLE book(id INT,name STRING(256),owner STRING(256) NOT NULL, price DOUBLE, PRIMARY KEY(id));";
+        String line = "CREATE TABLE book1(id INT,name STRING(256),owner STRING(256) NOT NULL, price DOUBLE, PRIMARY KEY(id));";
         TableMetaVisitor tableMeta = new TableMetaVisitor();
         CharStream stream = CharStreams.fromString(line);
         SQLLexer lexer = new SQLLexer(stream);
@@ -42,8 +42,11 @@ public class TableTest {
         if (f.exists())
             f.delete();
         f = new File(tableName + ".index");
-        if (f.exists())
+        if (f.exists()) {
+            System.out.println("indexFlen: " + f.length());
             f.delete();
+            System.out.println("indexFlen: " + f.length());
+        }
 
         ArrayList<Entry> entryList = new ArrayList<>();
         entryList.add(new Entry(1));
@@ -53,6 +56,7 @@ public class TableTest {
         row = new Row(entryList);
 
         table = new Table(databaseName, tableName, columns);
+        assert table.getIndexSize() == 0;
     }
 
     @Test

@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Session {
     long sessionId;
     boolean autoCommit;
-    Database database;
+    Database database = null;
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Session(long sessionId) {
@@ -42,8 +42,12 @@ public class Session {
     }
 
     public void setDatabase(Database database) {
-        database.start();
-        this.database = database;
+        destroy();
+        if (database != null) {
+            database.registerSession();
+            database.start();
+            this.database = database;
+        }
     }
 
     public void destroy() {

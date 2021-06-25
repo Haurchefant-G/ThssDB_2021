@@ -217,6 +217,8 @@ public class FileStorage {
             Page p = it.next();
             int empty = p.hasEmptyRow();
             if(empty != 0) {
+                row.page = p.pagenum;
+                row.offset = empty;
                 ByteBuffer rowbuffer = RowToByteBuffer(row);
                 p.writeRow(empty, rowbuffer);
                 return;
@@ -277,8 +279,9 @@ public class FileStorage {
     public void deleteFromPage(int page, int offset) throws IOException {
         int index = pageIndex.indexOf(page);
         Page p = null;
-        if (index >= 0) {
-            p = pages.get(index);
+        int i = pageIndex.indexOf(page);
+        if (i >= 0) {
+            p = pages.get(i);
         } else {
             p = fetchPage(page);
         }
@@ -311,8 +314,9 @@ public class FileStorage {
     public Row searchRowInPage(int page, int offset) throws IOException {
         int index = pageIndex.indexOf(page);
         Page p = null;
-        if (index >= 0) {
-            p = pages.get(index);
+        int i = pageIndex.indexOf(page);
+        if (i >= 0) {
+            p = pages.get(i);
         } else {
             openFile();
             if (file.length() < page * PAGE_BYTES + offset + rowLen)
@@ -465,8 +469,9 @@ public class FileStorage {
     protected int searchRowIndexInPage(int page, int offset) throws IOException {
         int index = pageIndex.indexOf(page);
         Page p = null;
-        if (index >= 0) {
-            p = pages.get(index);
+        int i = pageIndex.indexOf(page);
+        if (i >= 0) {
+            p = pages.get(i);
         } else {
             openFile();
             if (file.length() < page * PAGE_BYTES + offset + rowLen)

@@ -319,6 +319,8 @@ public class Table implements Iterable<Row> {
       }
       index.put(new Entry(value), fileStorage.searchRowInPage(page, offset));
     }
+    indexInput.close();
+    indexFile.close();
   }
 
   /**
@@ -331,8 +333,8 @@ public class Table implements Iterable<Row> {
     index = null;
     File f = new File(tableName + ".table");
     f.delete();
-    f = new File(tableName + ".index");
-    f.delete();
+    File f2 = new File(tableName + ".index");
+    f2.delete();
   }
 
   private MetaInfo getMetaInfo() {
@@ -398,6 +400,7 @@ public class Table implements Iterable<Row> {
       indexOutput.writeInt(node.getValue().offset);
     }
     indexOutput.close();
+    indexFile.close();
   }
 
   public boolean hasKey(Entry key) {
