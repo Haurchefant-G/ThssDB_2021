@@ -25,7 +25,8 @@ public class MySQLProcessorTest {
     public void init() {
         manger.createDatabaseIfNotExists("test");
         manger.createDatabaseIfNotExists("test2");
-        manger.switchDatabase("test", session);
+        manger.createDatabaseIfNotExists("MySQLProcessorTest");
+        manger.switchDatabase("MySQLProcessorTest", session);
     }
 
     /*
@@ -107,7 +108,7 @@ public class MySQLProcessorTest {
         assert statement.getType() == StatementType.USE_DATABASE;
         assert statement.getDatabaseName().equals("test2");
 
-        assert session.getDatabaseName().equals("test");
+        assert session.getDatabaseName().equals("MySQLProcessorTest");
         SQLResult sqlResult = sqlProcessor.useDatabase(statement, session);
         assert sqlResult.isSucceed();
         assert session.getDatabaseName().equals("test2");
@@ -126,10 +127,10 @@ public class MySQLProcessorTest {
         assert statement.getType() == StatementType.DROP_TABLE;
         assert statement.getTableName().equals("person");
 
-        assert manger.getDatabase("test").getTables().containsKey("person");
+        assert manger.getDatabase("MySQLProcessorTest").getTables().containsKey("person");
         SQLResult sqlResult = sqlProcessor.dropTable(statement, session);
         assert sqlResult.isSucceed();
-        assert !manger.getDatabase("test").getTables().containsKey("person");
+        assert !manger.getDatabase("MySQLProcessorTest").getTables().containsKey("person");
     }
 
     /*
@@ -156,15 +157,15 @@ public class MySQLProcessorTest {
         }
 
         try {
-            manger.getDatabase("test").drop("person");
+            manger.getDatabase("MySQLProcessorTest").drop("person");
         } catch (Exception ignored) {
 
         }
 
-        assert !manger.getDatabase("test").getTables().containsKey("person");
+        assert !manger.getDatabase("MySQLProcessorTest").getTables().containsKey("person");
         SQLResult sqlResult = sqlProcessor.createTable(statement, session);
         assert sqlResult.isSucceed();
-        assert manger.getDatabase("test").getTables().containsKey("person");
+        assert manger.getDatabase("MySQLProcessorTest").getTables().containsKey("person");
     }
 
     /**
@@ -224,7 +225,7 @@ public class MySQLProcessorTest {
 
         SQLResult sqlResult = sqlProcessor.insert(statement, session);
         assert sqlResult.isSucceed();
-        Table table = manger.getDatabase("test").getTable("person");
+        Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
 
         assert table.hasKey(new Entry("'liqi'"));
         assert table.hasKey(new Entry("'guiacan'"));
@@ -250,7 +251,7 @@ public class MySQLProcessorTest {
 
         SQLResult sqlResult = sqlProcessor.update(statement, session);
         assert sqlResult.isSucceed();
-        Table table = manger.getDatabase("test").getTable("person");
+        Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
         assert table.hasKey(new Entry("'qiqi'"));
 
         testCommit();
@@ -272,7 +273,7 @@ public class MySQLProcessorTest {
         assert statement.getWhere().getCondition().getLeft().getValue().getValue().equals("name");
         assert statement.getWhere().getCondition().getRight().getValue().getValue().equals("'liqi'");
 
-        Table table = manger.getDatabase("test").getTable("person");
+        Table table = manger.getDatabase("MySQLProcessorTest").getTable("person");
         assert table.hasKey(new Entry("'liqi'"));
         SQLResult sqlResult = sqlProcessor.delete(statement, session);
         assert sqlResult.isSucceed();
@@ -312,19 +313,19 @@ public class MySQLProcessorTest {
                    + "INSERT INTO book values (1, 'math', 'liqi'), (2, 'chinese', 'guiacan'), (3, 'english', 'liqi'), (4, 'english', 'guiacan'), (5, 'english', 'sa')";
 
         try {
-            manger.getDatabase("test").drop("person");
+            manger.getDatabase("MySQLProcessorTest").drop("person");
         } catch (Exception ignored) {
 
         }
 
         try {
-            manger.getDatabase("test").drop("book");
+            manger.getDatabase("MySQLProcessorTest").drop("book");
         } catch (Exception ignored) {
 
         }
 
         try {
-            manger.getDatabase("test").drop("live");
+            manger.getDatabase("MySQLProcessorTest").drop("live");
         } catch (Exception ignored) {
 
         }
