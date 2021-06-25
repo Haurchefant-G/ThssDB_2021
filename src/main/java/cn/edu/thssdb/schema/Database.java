@@ -121,7 +121,7 @@ public class Database {
     lock.writeLock().lock();
     for(String name: tables.keySet()) {
       drop(name);
-      tables = null;
+      tables.clear();
     }
     File f = new File(name + ".db");
     f.delete();
@@ -187,7 +187,7 @@ public class Database {
         for (Table table : tables.values()) {
           table.close();
         }
-        tables = null;
+        tables.clear();
         open = false;
       }
       lock.writeLock().unlock();

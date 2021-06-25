@@ -32,6 +32,7 @@ public class DatabaseTest {
     public static void setup() {
         String line = "create database dbtest;";
         dbname = "dbtest";
+        tableName = "book";
         DatabaseMetaVisitor databaseMeta = new DatabaseMetaVisitor();
         CharStream stream = CharStreams.fromString(line);
         SQLLexer lexer = new SQLLexer(stream);
@@ -41,61 +42,73 @@ public class DatabaseTest {
         File f = new File(dbname + ".db");
         if (f.exists())
             f.delete();
+        f = new File(tableName + ".index");
+        if (f.exists())
+            f.delete();
+        f = new File(tableName + ".table");
+        if (f.exists())
+            f.delete();
 
         database = databaseMeta.visitCreate_db_stmt(parser.create_db_stmt());
         // database = new Database("123");
         assert database.getName().equals(dbname);
     }
 
-//    @Test
-//    public void test1_start() throws IOException {
-//        database.start();
-//        assert database.getSessionNum() == 0;
-//        System.out.println(database.getTables());
-//        assert database.getTables() == null;
-//
-//        String line = "CREATE TABLE book(id INT,name STRING(256),owner STRING(256) NOT NULL, price DOUBLE, PRIMARY KEY(id));";
-//        TableMetaVisitor tableMeta = new TableMetaVisitor();
-//        CharStream stream = CharStreams.fromString(line);
-//        SQLLexer lexer = new SQLLexer(stream);
-//        CommonTokenStream token = new CommonTokenStream(lexer);
-//        SQLParser parser = new SQLParser(token);
-//        MetaInfo meta = tableMeta.visitCreate_table_stmt(parser.create_table_stmt());
-//        columns = meta.getColumns();
-//        tableName = meta.getTableName();
-//
-//        database.create(tableName, columns);
-//
-//        assert database.getTables().size() == 1;
-//        table = database.getTable(tableName);
-//        assert table.getTableName() == tableName;
-//        System.out.println(database.getColumns(tableName));
-//
-//        ArrayList<Entry> entryList = new ArrayList<>();
-//        entryList.add(new Entry(1));
-//        entryList.add(new Entry("name"));
-//        entryList.add(new Entry("owner"));
-//        entryList.add(new Entry(3.99));
-//        row = new Row(entryList);
-//        table.insert(row);
-//    }
-//
-//    @Test
-//    public void test2_recover() throws IOException {
-//        database.quit();
-//        database.start();
-//        assert database.getTables().size() == 1;
-//        table = database.getTable(tableName);
-//        assert table.getTableName() == tableName;
-//        System.out.println(database.getColumns(tableName));
-//
-//        Row nrow = table.fileStorage.searchRowInPage(0, table.fileStorage.getRowLen());
-//        System.out.println(nrow);
-//    }
+    @Test
+    public void test1_start() throws IOException {
+        database.start();
+        assert database.getSessionNum() == 0;
+        System.out.println(database.getTables());
+        assert database.getTables().size() == 0;
+
+        String line = "CREATE TABLE book(id INT,name STRING(256),owner STRING(256) NOT NULL, price DOUBLE, PRIMARY KEY(id));";
+        TableMetaVisitor tableMeta = new TableMetaVisitor();
+        CharStream stream = CharStreams.fromString(line);
+        SQLLexer lexer = new SQLLexer(stream);
+        CommonTokenStream token = new CommonTokenStream(lexer);
+        SQLParser parser = new SQLParser(token);
+        MetaInfo meta = tableMeta.visitCreate_table_stmt(parser.create_table_stmt());
+        columns = meta.getColumns();
+        tableName = meta.getTableName();
+
+        database.create(tableName, columns);
+
+        assert database.getTables().size() == 1;
+        table = database.getTable(tableName);
+        assert table.getTableName() == tableName;
+        System.out.println(database.getColumns(tableName));
+
+        ArrayList<Entry> entryList = new ArrayList<>();
+        entryList.add(new Entry(1));
+        entryList.add(new Entry("name"));
+        entryList.add(new Entry("owner"));
+        entryList.add(new Entry(3.99));
+        row = new Row(entryList);
+        table.insert(row);
+    }
+
+    @Test
+    public void test2_recover() throws IOException {
+        database.quit();
+        database.start();
+        assert database.getTables().size() == 1;
+        table = database.getTable(tableName);
+        assert table.getTableName().equals(tableName);
+        System.out.println(database.getColumns(tableName));
+
+        Row nrow = table.fileStorage.searchRowInPage(0, table.fileStorage.getRowLen());
+        System.out.println(nrow);
+    }
+
+    @Test
+    public void test3_drop() {
+        database.drop(tableName);
+        assert database.getTables().size() == 0;
+    }
 
     @AfterClass
     public static void destroy() {
         database.clear();
-        assert database.getTables() == null;
+        assert database.getTables().size() == 0;
     }
 }
