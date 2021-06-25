@@ -21,7 +21,7 @@ public class JointTable implements QueryTable {
         for (Table table : tables) {
             iterators.add(table.iterator());
         }
-        metaInfos = tables.stream().map(table -> new MetaInfo(table.getTableName(), table.columns)).collect(Collectors.toList());
+        metaInfos = tables.stream().map(table -> new MetaInfo(table.getTableName(), table.getColumns())).collect(Collectors.toList());
         join = where.parse(metaInfos);
         pushNextLegalRowToBuffer();
     }

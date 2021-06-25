@@ -7,11 +7,11 @@ import java.nio.ByteBuffer;
  * 第一行记录一个数值head，记录一个可插入数据的起始字节位置
  */
 public class Page {
-    public int pagenum = 0;             /** 页码 */
-    public int accessnum = 1;           /** 页面访问次数 */
-    public boolean changed = false;     /** 页面是否修改过 */
-    public ByteBuffer content;          /** 页面数据 */
-    public int rowsize = 1;             /** 每行记录字节数 */
+    int pagenum = 0;             /** 页码 */
+    int accessnum = 1;           /** 页面访问次数 */
+    boolean changed = false;     /** 页面是否修改过 */
+    ByteBuffer content;          /** 页面数据 */
+    int rowsize = 1;             /** 每行记录字节数 */
 
     /**
      * 根据容量创建一个新存储页
@@ -22,6 +22,7 @@ public class Page {
         this.pagenum = pagenum;
         this.content = ByteBuffer.allocate(pagesize);
         this.rowsize = rowsize;
+        content.putInt(0, rowsize);
     }
 
     /**
@@ -45,7 +46,7 @@ public class Page {
 //            int empty = content.getInt(head);
 //            return empty;
 //        }
-        return head;
+        return head == -1 ? 0 : head;
     }
 
     /**
@@ -56,7 +57,7 @@ public class Page {
     public void writeRow(int index, ByteBuffer rowbuffer) {
         int head = content.getInt(index);
         if (head == 0) {
-            head = (index + (rowsize << 2) > content.capacity()) ? 0 : (index + rowsize);
+            head = (index + (rowsize << 1) > content.capacity()) ? -1 : (index + rowsize);
         }
         content.putInt(0, head);
         content.position(index);
@@ -88,11 +89,16 @@ public class Page {
      * @return 存储此行记录的bytebuffer
      */
     public ByteBuffer searchRow(int index) {
-        ByteBuffer rowbuffer = ByteBuffer.allocate(rowsize);
+        byte[] bytes = new byte[rowsize];
         content.position(index);
-        content.put(rowbuffer);
+        content.get(bytes);
+        ByteBuffer rowbuffer = ByteBuffer.wrap(bytes);
         ++accessnum;
         return rowbuffer;
+    }
+
+    public void resetAccess() {
+        accessnum = 0;
     }
 
 }

@@ -49,8 +49,8 @@ public class IServiceHandler implements IService.Iface {
     Status status = result.isSucceed() ? new Status(Global.SUCCESS_CODE) : new Status(Global.FAILURE_CODE);
     boolean isAbort = result.isAbort();
     boolean hasResult = result.isHasResult();
-    String msg = result.getMsg();
-    ExecuteStatementResp resp = new ExecuteStatementResp(status, isAbort, hasResult, msg);
+    status.msg = result.getMsg();
+    ExecuteStatementResp resp = new ExecuteStatementResp(status, isAbort, hasResult);
     if (result.isHasResult()) {
       resp.setColumnsList(result.getColumnList());
       resp.setRowList(result.getRowList());

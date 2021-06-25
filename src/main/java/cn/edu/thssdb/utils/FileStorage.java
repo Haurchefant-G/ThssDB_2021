@@ -22,19 +22,19 @@ public class FileStorage {
     /** 表对应文件名 */
     private String filename = null;
     /** 维护的页存储的最大数量 */
-    private static final int keeppages = 1024;
+    private static int keeppages = 1024;
     /** 内存中的页存 */
     private ArrayList<Page> pages;
     /** 在内存中的页码，与pages中顺序保持一致 */
-    private ArrayList<Integer> pagenums;
+    private ArrayList<Integer> pageIndex;
 
     /** 在内存中的页的比特数 */
-    static private final int PAGE_BYTES = 4 * 1024;
+    static private int PAGE_BYTES = 4 * 1024;
 
     /** 存储文件读写用 */
     RowRandomAccessFile file = null;
 
-    private class RowRandomAccessFile extends RandomAccessFile {
+    protected class RowRandomAccessFile extends RandomAccessFile {
         private ArrayList<Column> columns;
         public RowRandomAccessFile(String filename, String mode, ArrayList<Column> columns) throws FileNotFoundException {
             super(filename, mode);
@@ -78,7 +78,8 @@ public class FileStorage {
      * @param columns 表头schema
      */
     public FileStorage(String filename, ArrayList<Column> columns) {
-        rowLen = 2;
+        rowLen = 2; // 每行末尾的换行符预留位置
+        rowLen += 4; // 页式存储中每行前用于指示下一个空行的index
         for (Column column : this.columns = columns) {
             rowLen += column.getMaxLength();
             if (column.getType() == ColumnType.STRING) {
@@ -86,13 +87,9 @@ public class FileStorage {
             }
         }
         this.filename = filename;
-        pagenums = new ArrayList<>();
+        pageIndex = new ArrayList<>();
         pages = new ArrayList<>();
     }
-
-//    public void loadDataFile(String filename) {
-//        this.filename = filename;
-//    }
 
     /**
      * 将一行Row转化为一个ByteBuffer，便于写入到内存中的页存储中
@@ -102,9 +99,10 @@ public class FileStorage {
     public ByteBuffer RowToByteBuffer(Row row) {
         ArrayList<Entry> entries = row.getEntries();
         ByteBuffer rowbuffer = ByteBuffer.allocate(rowLen);
-        //writeColumntoBuffer(rowbuffer, entries.get(0).value, columns.get(0).getType());
+
+        rowbuffer.putInt(0);
+
         for(int i = 0; i < columns.size(); ++i) {
-            //rowbuffer.putChar(',');
             writeColumntoBuffer(rowbuffer, entries.get(i).value, columns.get(i).getType());
         }
         rowbuffer.putChar(rowLen - 2, '\n');
@@ -140,12 +138,11 @@ public class FileStorage {
 
     public Row ByteBufferToRow(ByteBuffer rowbuffer) {
         Entry []entries = new Entry[columns.size()];
-        //ByteBuffer rowbuffer = ByteBuffer.allocate(rowLen);
-        //entries[0] = readColumntoEntry(rowbuffer, columns.get(0).getType());
+        rowbuffer.rewind();
+        rowbuffer.getInt();
         for(int i = 0; i < columns.size(); ++i) {
             entries[i] = readColumntoEntry(rowbuffer, columns.get(i).getType());
         }
-        //rowbuffer.putChar(rowLen - 1, '\n');
         return new Row(entries);
     }
 
@@ -278,7 +275,7 @@ public class FileStorage {
      * @throws IOException
      */
     public void deleteFromPage(int page, int offset) throws IOException {
-        int index = pagenums.indexOf(page);
+        int index = pageIndex.indexOf(page);
         Page p = null;
         if (index >= 0) {
             p = pages.get(index);
@@ -312,7 +309,7 @@ public class FileStorage {
      * @throws IOException
      */
     public Row searchRowInPage(int page, int offset) throws IOException {
-        int index = pagenums.indexOf(page);
+        int index = pageIndex.indexOf(page);
         Page p = null;
         if (index >= 0) {
             p = pages.get(index);
@@ -352,7 +349,7 @@ public class FileStorage {
             file.write(content);
         }
         Page newpage = new Page(page, content, rowLen);
-        pagenums.add(page);
+        pageIndex.add(page);
         pages.add(newpage);
         return newpage;
     }
@@ -372,9 +369,11 @@ public class FileStorage {
             updateFile(p);
             p = null;
         }
-        pagenums.clear();
+        pageIndex.clear();
         for (Iterator<Page> it = pages.iterator(); it.hasNext();) {
-            pagenums.add(it.next().pagenum);
+            Page p = it.next();
+            p.resetAccess();
+            pageIndex.add(p.pagenum);
         }
     }
 
@@ -440,7 +439,7 @@ public class FileStorage {
             if (file != null) {
                 clearAll();
                 pages = null;
-                pagenums = null;
+                pageIndex = null;
                 columns = null;
                 file.close();
                 file = null;
@@ -448,6 +447,35 @@ public class FileStorage {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    protected int getPageNum() {
+        return pages != null ? pages.size() : 0;
+    }
+
+    protected int getPageIndex(int index) {
+        return pageIndex != null ? pageIndex.get(index) : -1;
+    }
+
+    protected int getRowLen() {
+        return rowLen;
+    }
+
+    protected int searchRowIndexInPage(int page, int offset) throws IOException {
+        int index = pageIndex.indexOf(page);
+        Page p = null;
+        if (index >= 0) {
+            p = pages.get(index);
+        } else {
+            openFile();
+            if (file.length() < page * PAGE_BYTES + offset + rowLen)
+                throw new RowNotExistException();
+            p = fetchPage(page);
+        }
+        ByteBuffer buffer = p.searchRow(offset);
+        buffer.rewind();
+        return buffer.getInt();
     }
 
 }

@@ -103,7 +103,15 @@ public class SQLProcessor {
     }
 
     public SQLResult showDatabase(ShowDatabasesStatement statement, Session session) {
-        return null;
+        try {
+            List<String> heads = Arrays.asList("Database Name");
+            List<String> databaseNames = manager.getDatabases(session);
+            List<List<String>> stackDatabaseNames = databaseNames.stream().map(Arrays::asList).collect(Collectors.toList());
+
+            return new SQLResult("Show databases", heads, stackDatabaseNames, true);
+        } catch (Exception e) {
+            return new SQLResult(e.getMessage(), false);
+        }
     }
 
     public SQLResult showTables(ShowTablesStatement statement, Session session) {
