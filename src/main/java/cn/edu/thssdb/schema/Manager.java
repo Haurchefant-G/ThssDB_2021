@@ -6,6 +6,7 @@ import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLProcessor;
 import cn.edu.thssdb.parser.SQLResult;
 import cn.edu.thssdb.parser.statement.Statement;
+import cn.edu.thssdb.parser.statement.StatementType;
 import cn.edu.thssdb.query.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.DatabaseMetaVisitor;
@@ -43,7 +44,7 @@ public class Manager {
     sessionList = new ArrayList<Session>();
     recoverMeta();
     createDatabaseIfNotExists("Default");
-    
+
     transactionManager = new TransactionManager();
   }
 
@@ -324,11 +325,11 @@ public class Manager {
         SQLParser parser = new SQLParser(token);
         Database database = databaseMeta.visitCreate_db_stmt(parser.create_db_stmt());
         databases.put(database.getName(), database);
-        
+
         Session session = new Session(-1);
         session.setDatabase(database);
         read_log(session);
-        
+
         line = br.readLine();
       }
       fr.close();
@@ -398,12 +399,10 @@ public class Manager {
       if (tableQuery.getTableRight() == null) {
         return new SingleTable(database.getTable(tableQuery.getTableLeft()));
       } else {
+        Table tableLeft = database.getTable(tableQuery.getTableLeft());
+        Table tableRight = database.getTable(tableQuery.getTableRight());
         Where condition = tableQuery.getWhere();
-        List<Table> tables = new ArrayList<Table>() {{
-          add(database.getTable(tableQuery.getTableLeft()));
-          add(database.getTable(tableQuery.getTableRight()));
-        }};
-        return new JointTable(tables, condition);
+        return new JointTable(tableLeft, tableRight, condition, tableQuery.isOuterLeft(), tableQuery.isOuterRight());
       }
     } finally {
       database.lock.readLock().unlock();

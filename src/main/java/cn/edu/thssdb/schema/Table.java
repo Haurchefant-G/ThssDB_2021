@@ -8,6 +8,7 @@ import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.query.Value;
 import cn.edu.thssdb.query.Where;
 import cn.edu.thssdb.type.ColumnType;
+import cn.edu.thssdb.type.LockType;
 import cn.edu.thssdb.utils.FileStorage;
 import cn.edu.thssdb.utils.Page;
 import cn.edu.thssdb.utils.Pair;
@@ -30,11 +31,11 @@ public class Table implements Iterable<Row> {
   public BPlusTree<Entry, Row> index;
   private int primaryIndex;
   private FileStorage fileStorage;
-  
+
   LockType lockType;
   public ArrayList<Long> S_lock;
   public ArrayList<Long> X_lock;
-  
+
 
   public void insert(List<String> columnNames, List<List<Value>> values) throws IOException {
     try {
@@ -175,7 +176,7 @@ public class Table implements Iterable<Row> {
     this.S_lock = new ArrayList<Long>();
     this.X_lock = new ArrayList<Long>();
     this.lockType = LockType.NONE;
-    
+
     try {
       recover();
     } catch (IOException e) {
@@ -247,7 +248,7 @@ public class Table implements Iterable<Row> {
       lockType = LockType.NONE;
     }
   }
-  
+
   /**
    * 设置表所在的数据库
    * @param name 数据库名
@@ -285,7 +286,7 @@ public class Table implements Iterable<Row> {
     this.S_lock = new ArrayList<Long>();
     this.X_lock = new ArrayList<Long>();
     this.lockType = LockType.NONE;
-    
+
     try {
       recover();
     } catch (IOException e) {
