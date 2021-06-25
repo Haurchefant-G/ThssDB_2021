@@ -53,8 +53,12 @@ public class Manager {
   public void deleteSession(long sessionId) {
     for (Session session: sessionList) {
       if (session.getSessionId() == sessionId) {
-        session.getLock().writeLock().unlock();
-        session.getLock().readLock().unlock();
+        try {
+          session.getLock().writeLock().unlock();
+          session.getLock().readLock().unlock();
+        } catch (Exception e) {
+
+        }
         session.destroy();
         sessionList.remove(session);
         break;

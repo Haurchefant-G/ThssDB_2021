@@ -75,6 +75,13 @@ public class Client {
             }
             break;
           case Global.LOGIN:
+            print("username:");
+            String username = SCANNER.nextLine().trim();
+            print("password:");
+            String password = SCANNER.nextLine().trim();
+            if (login(username, password)) {
+              terminal();
+            }
             break;
           case Global.SHOW_TIME:
             getTime();
@@ -86,8 +93,8 @@ public class Client {
             println("Invalid statements!");
             break;
         }
-        long endTime = System.currentTimeMillis();
-        println("It costs " + (endTime - startTime) + " ms.");
+//        long endTime = System.currentTimeMillis();
+//        println("It costs " + (endTime - startTime) + " ms.");
         if (!open) {
           break;
         }
@@ -207,16 +214,20 @@ public class Client {
       println("");
       println(resp.getStatus().getMsg());
       if (resp.isHasResult()) {
-        for (String col: resp.getColumnsList()) {
-          print(col);
-          print("    ");
+        if (resp.getColumnsList() != null) {
+          for (String col : resp.getColumnsList()) {
+            print(col);
+            print("    ");
+          }
         }
         println("");
         println("--------");
-        for (List<String> row: resp.getRowList()) {
-          for (String cell: row) {
-            print(cell);
-            print("    ");
+        if (resp.getRowList() != null) {
+          for (List<String> row : resp.getRowList()) {
+            for (String cell : row) {
+              print(cell);
+              print("    ");
+            }
             println("");
           }
         }
@@ -239,7 +250,17 @@ public class Client {
       long startTime = System.currentTimeMillis();
       switch (msg) {
         case Global.LOGOUT:
-          println(USERNAME + "log out");
+          println(USERNAME + "log out;");
+          DisconnetReq req = new DisconnetReq(sessionId);
+          try {
+            DisconnetResp resp = client.disconnect(req);
+            if (resp.getStatus().getCode() == Global.SUCCESS_CODE) {
+              println("You have logged out!");
+              println("");
+            }
+          } catch (TException e) {
+            logger.error(e.getMessage());
+          }
           connect = false;
           break;
         default:
