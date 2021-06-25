@@ -27,6 +27,7 @@ public class Database {
   private HashMap<String, Table> tables;
   ReentrantReadWriteLock lock;
   private boolean open;
+  private int sessionNum;
 
   /**
    * 创建数据库
@@ -37,6 +38,7 @@ public class Database {
     this.tables = new HashMap<>();
     this.lock = new ReentrantReadWriteLock();
     this.open = false;
+    this.sessionNum = 0;
   }
 
   /**
@@ -178,16 +180,18 @@ public class Database {
    */
   public void quit() {
     // TODO
-    lock.writeLock().lock();
-    if (open) {
-      persist();
-      for(Table table: tables.values()) {
-        table.close();
+    if (sessionNum == 0) {
+      lock.writeLock().lock();
+      if (open) {
+        persist();
+        for (Table table : tables.values()) {
+          table.close();
+        }
+        tables = null;
+        open = false;
       }
-      tables = null;
-      open = false;
+      lock.writeLock().unlock();
     }
-    lock.writeLock().unlock();
   }
 
   /**
@@ -232,5 +236,23 @@ public class Database {
     } finally {
       lock.readLock().unlock();
     }
+  }
+
+  public void registerSession() {
+    ++sessionNum;
+  }
+
+  public void logoutSession() {
+    --sessionNum;
+  }
+
+  public int getSessionNum() {
+    return sessionNum;
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    quit();
   }
 }

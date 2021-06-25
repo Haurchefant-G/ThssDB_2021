@@ -57,6 +57,7 @@ public class Manager {
       if (session.getSessionId() == sessionId) {
         session.getLock().writeLock().unlock();
         session.getLock().readLock().unlock();
+        session.destroy();
         sessionList.remove(session);
         break;
       }

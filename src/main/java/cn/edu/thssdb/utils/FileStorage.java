@@ -450,15 +450,15 @@ public class FileStorage {
     }
 
 
-    protected int getPageNum() {
+    public int getPageNum() {
         return pages != null ? pages.size() : 0;
     }
 
-    protected int getPageIndex(int index) {
+    public int getPageIndex(int index) {
         return pageIndex != null ? pageIndex.get(index) : -1;
     }
 
-    protected int getRowLen() {
+    public int getRowLen() {
         return rowLen;
     }
 

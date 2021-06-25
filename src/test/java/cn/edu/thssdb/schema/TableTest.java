@@ -25,7 +25,6 @@ public class TableTest {
     static String tableName;
     static Table table;
     static String databaseName = "test";
-    private static final SQLProcessor sqlProcessor = new SQLProcessor(null);
 
     @BeforeClass
     public static void setup() throws NoSuchFieldException, IllegalAccessException {
