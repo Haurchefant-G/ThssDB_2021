@@ -32,7 +32,7 @@ public class MySQLVisitorTest {
         CreateUserStatement statement = (CreateUserStatement) sqlProcessor.parseSQL(sql).get(0);
         assert statement.getType() == StatementType.CREATE_USER;
         assert statement.getUsername().equals("liqi");
-        assert statement.getPassword().equals("'123456'");
+        assert statement.getPassword().equals("123456");
     }
 
     /*
@@ -144,9 +144,9 @@ public class MySQLVisitorTest {
         assert statement.getTableName().equals("person");
         assert statement.getColumnNames().get(0).equals("name");
         assert statement.getColumnNames().get(1).equals("id");
-        assert statement.getValues().get(0).get(0).getValue().equals("'liqi'");
+        assert statement.getValues().get(0).get(0).getValue().equals("liqi");
         assert ((Number)statement.getValues().get(0).get(1).getValue()).intValue() == 1;
-        assert statement.getValues().get(1).get(0).getValue().equals("'guiacan'");
+        assert statement.getValues().get(1).get(0).getValue().equals("guiacan");
         assert ((Number)statement.getValues().get(1).get(1).getValue()).intValue() == 2;
 
         String sql1 = "insert into person values ('liqi', 1), ('guiacan', 2)";
@@ -182,7 +182,7 @@ public class MySQLVisitorTest {
         UpdateStatement statement = (UpdateStatement) sqlProcessor.parseSQL(sql).get(0);
         assert statement.getType() == StatementType.UPDATE;
         assert statement.getTableName().equals("person");
-        assert statement.getExpression().getValue().getValue().equals("'liqi'");
+        assert statement.getExpression().getValue().getValue().equals("liqi");
     }
 
     /*
@@ -196,7 +196,7 @@ public class MySQLVisitorTest {
         assert statement.getType() == StatementType.DELETE;
         assert statement.getTableName().equals("person");
         assert statement.getWhere().getCondition().getLeft().getValue().getValue().equals("name");
-        assert statement.getWhere().getCondition().getRight().getValue().getValue().equals("'liqi'");
+        assert statement.getWhere().getCondition().getRight().getValue().getValue().equals("liqi");
     }
 
 
