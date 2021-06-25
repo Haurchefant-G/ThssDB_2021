@@ -2,6 +2,7 @@ package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.exception.ColumnNotExistException;
 import cn.edu.thssdb.exception.DuplicateColumnException;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Row;
 
@@ -45,7 +46,15 @@ public class QueryResult {
 
     private void buildIndex() {
       if (columnNames == null) {
+        columnNames = new ArrayList<>();
         asterisk = true;
+        for (QueryTable queryTable : queryTables) {
+          for (MetaInfo metaInfo : queryTable.getMetaInfo()) {
+              for (Column column : metaInfo.getColumns()) {
+                  columnNames.add(metaInfo.getTableName() + "." + column.getName());
+              }
+          }
+        }
         return;
       }
 
